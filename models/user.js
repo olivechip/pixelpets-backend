@@ -1,79 +1,99 @@
-// const express = require('express');
-// const router = express.Router();
-// const User = require('../models/user');
+const db = require("../db");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
-// // Test route to check if server works
-// router.get('/', (req, res) => {
-//     res.json('users');
-// });
 
-// // Register route
-// router.post('/register', async (req, res) => {
-//     const { username, email, password } = req.body;
-//     try {
-//         const newUser = await User.register({ username, email, password });
-//         res.status(201).json(newUser);
-//     } catch (error) {
-//         console.error('Error registering user:', error);
-//         res.status(400).json({ error: error.message });
-//     }
-// });
+/** Collection of related methods for users. */
 
-// // Login route
-// router.post('/login', async (req, res) => {
-//     const { email, password } = req.body;
-//     try {
-//         const { token, user } = await User.login({ email, password });
-//         res.json({ token, user });
-//     } catch (error) {
-//         console.error('Error logging in:', error);
-//         res.status(401).json({ error: error.message });
-//     }
-// });
+class User {
+    static async findAll(){
+        try {
+            const result = db.query(`SELECT username, email, created_at, updated_at FROM users;`);
+            return result;
+        } catch (error) {
+            console.error('Error finding users:', error);
+            throw new Error('Database query failed');
+        }
+    }
+    static async find(criteria){
+        const keys = Object.keys(criteria);
+        const conditions = keys.map((key, index) => `${key} = $${index + 1}`).join(' AND ');
 
-// // Get user by ID
-// router.get('/:userid', async (req, res) => {
-//     const { userid } = req.params;
-//     try {
-//         const user = await User.find({ id: userid });
-//         if (user) {
-//             res.json(user);
-//         } else {
-//             res.status(404).json({ error: 'User not found' });
-//         }
-//     } catch (error) {
-//         console.error('Error finding user:', error);
-//         res.status(500).json({ error: 'Server error' });
-//     }
-// });
+        try {
+            const result = await db.query(`SELECT * FROM users WHERE ${conditions}`, Object.values(criteria));
+            return result.rows[0] || null;
+          } catch (error) {
+            console.error('Error finding user:', error);
+            throw new Error('Database query failed');
+          }
+    }
 
-// // Update user by ID
-// router.put('/:userid', async (req, res) => {
-//     const { userid } = req.params;
-//     const updates = req.body;
-//     try {
-//         const updatedUser = await User.update(userid, updates);
-//         res.json(updatedUser);
-//     } catch (error) {
-//         console.error('Error updating user:', error);
-//         res.status(400).json({ error: error.message });
-//     }
-// });
+    static async register({ username, email, password }) {
+        const existingUser = await this.find({ email });
+        if (existingUser) throw new Error('User already exists');
+    
+        const hashedPassword = await bcrypt.hash(password, 10);
+    
+        try {
+          const result = await db.query(
+            `INSERT INTO users (username, email, password, created_at, updated_at)
+             VALUES ($1, $2, $3, NOW(), NOW())
+             RETURNING id, username, email, created_at, updated_at;`,
+            [username, email, hashedPassword]
+          );
+          return result.rows[0];
+        } catch (error) {
+          console.error('Error registering user:', error);
+          throw new Error('Registration failed');
+        }
+      }
+    
+      static async login({ email, password }) {
+        const user = await this.find({ email });
+        console.log(user)
+        if (!user || !(await bcrypt.compare(password, user.password))) throw new Error('Invalid credentials');
+    
+        try {
+          const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+          return { token, user: { id: user.id, username: user.username, email: user.email } };
+        } catch (error) {
+          console.error('Error logging in:', error);
+          throw new Error('Login failed');
+        }
+      }
+    
+      static async update(userId, updates) {  
+        const keys = Object.keys(updates);  
+        
+        // Check if password is being updated and hash it  
+        if (updates.password) {  
+            updates.password = await bcrypt.hash(updates.password, 10);  
+        }  
+    
+        const setClause = keys.map((key, index) => `${key} = $${index + 2}`).join(', ');  
+    
+        try {  
+            const result = await db.query(  
+                `UPDATE users SET ${setClause}, updated_at = NOW() WHERE id = $1 RETURNING id, username, email, created_at, updated_at;`,  
+                [userId, ...Object.values(updates)]  
+            );  
+            return result.rows[0];  
+        } catch (error) {  
+            console.error('Error updating user:', error);  
+            throw new Error('Update failed');  
+        } 
+      }
+    
+      static async delete(userId) {
+        try {
+          const result = await db.query('DELETE FROM users WHERE id = $1 RETURNING id;', [userId]);
+          return result.rowCount > 0;
+        } catch (error) {
+          console.error('Error deleting user:', error);
+          throw new Error('Deletion failed');
+        }
+      }
+}
 
-// // Delete user by ID
-// router.delete('/:userid', async (req, res) => {
-//     const { userid } = req.params;
-//     try {
-//         const success = await User.delete(userid);
-//         if (success) {
-//             res.json({ message: 'User deleted successfully' });
-//         } else {
-//             res.status(404).json({ error: 'User not found' });
-//         }
-//     } catch (error) {
-//         console.error('Error deleting user:', error);
-//         res.status(500).json({ error: 'Server error' });
-//     }
-// });
 
-// module.exports = router;
+module.exports = User;

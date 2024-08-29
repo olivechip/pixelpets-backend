@@ -11,8 +11,8 @@ CREATE DATABASE pixelpets;
 \echo 'Delete and recreate pixelpets_test db?'
 \prompt 'Return for yes or control-C to cancel > ' foo
 
-DROP DATABASE pixelpets-test;
-CREATE DATABASE pixelpets-test;
-\connect pixelpets-test
+DROP DATABASE pixelpets_test;
+CREATE DATABASE pixelpets_test;
+\connect pixelpets_test
 
 \i pixelpets-schema.sql
