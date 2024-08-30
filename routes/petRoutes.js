@@ -17,7 +17,6 @@ router.get('/', async (req, res) => {
 router.get('/:petName', async (req, res) => {
     const { petName } = req.params;
     try {
-      // Assuming you have a findById method in your Pet model
       const pet = await Pet.findByName(petName); 
       if (pet) {
         res.json(pet);
@@ -43,12 +42,12 @@ router.post('/create', async (req, res) => {
 });
 
 
-// Update a pet by ID (you'll need to define the update logic in your Pet model)
-router.put('/:petId', async (req, res) => {
-  const { petId } = req.params;
+// Update a pet by name
+router.put('/:petName', async (req, res) => {
+  const { petName } = req.params;
   const updates = req.body;
   try {
-    const updatedPet = await Pet.update(petId, updates); // Assuming you have an update method
+    const updatedPet = await Pet.update(petName, updates);
     res.json(updatedPet);
   } catch (error) {
     console.error('Error updating pet:', error);
@@ -57,10 +56,10 @@ router.put('/:petId', async (req, res) => {
 });
 
 // Delete a pet by ID
-router.delete('/:petId', async (req, res) => {
-  const { petId } = req.params;
+router.delete('/:petName', async (req, res) => {
+  const { petName } = req.params;
   try {
-    const success = await Pet.delete(petId);
+    const success = await Pet.delete(petName);
     if (success) {
       res.json({ message: 'Pet deleted successfully' });
     } else {
@@ -72,36 +71,36 @@ router.delete('/:petId', async (req, res) => {
   }
 });
 
-// Feed a pet
-router.post('/:petId/feed', async (req, res) => {
-  const { petId } = req.params;
-  try {
-    const pet = await Pet.findById(petId);
-    if (!pet) {
-      return res.status(404).json({ error: 'Pet not found' });
-    }
-    await pet.feed(); // Call the feed instance method
-    res.json({ message: 'Pet fed successfully' });
-  } catch (error) {
-    console.error('Error feeding pet:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
+// // Feed a pet
+// router.post('/:petId/feed', async (req, res) => {
+//   const { petId } = req.params;
+//   try {
+//     const pet = await Pet.findById(petId);
+//     if (!pet) {
+//       return res.status(404).json({ error: 'Pet not found' });
+//     }
+//     await pet.feed(); // Call the feed instance method
+//     res.json({ message: 'Pet fed successfully' });
+//   } catch (error) {
+//     console.error('Error feeding pet:', error);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
 
-// Play with a pet
-router.post('/:petId/play', async (req, res) => {
-  const { petId } = req.params;
-  try {
-    const pet = await Pet.findById(petId);
-    if (!pet) {
-      return res.status(404).json({ error: 'Pet not found' });
-    }
-    await pet.play(); // Call the play instance method
-    res.json({ message: 'Played with pet successfully' });
-  } catch (error) {
-    console.error('Error playing with pet:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
+// // Play with a pet
+// router.post('/:petId/play', async (req, res) => {
+//   const { petId } = req.params;
+//   try {
+//     const pet = await Pet.findById(petId);
+//     if (!pet) {
+//       return res.status(404).json({ error: 'Pet not found' });
+//     }
+//     await pet.play(); // Call the play instance method
+//     res.json({ message: 'Played with pet successfully' });
+//   } catch (error) {
+//     console.error('Error playing with pet:', error);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
 
 module.exports = router;

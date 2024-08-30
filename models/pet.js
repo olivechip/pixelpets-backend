@@ -42,15 +42,15 @@ class Pet {
         }
     }
 
-    // Update a pet by ID
-    static async update(petId, updates) {
+    // Update a pet by name
+    static async update(petName, updates) {
         const keys = Object.keys(updates);
         const setClause = keys.map((key, index) => `${key} = $${index + 2}`).join(', ');
 
         try {
             const result = await db.query(
-                `UPDATE pets SET ${setClause}, updated_at = NOW() WHERE id = $1 RETURNING *;`,
-                [petId, ...Object.values(updates)]
+                `UPDATE pets SET ${setClause}, updated_at = NOW() WHERE name = $1 RETURNING *;`,
+                [petName, ...Object.values(updates)]
             );
             return result.rows[0];
         } catch (error) {
@@ -60,9 +60,9 @@ class Pet {
     }
 
     // Delete a pet
-    static async delete(petId) {
+    static async delete(petName) {
         try {
-            const result = await db.query('DELETE FROM pets WHERE id = $1 RETURNING id;', [petId]);
+            const result = await db.query('DELETE FROM pets WHERE name = $1 RETURNING id;', [petName]);
             return result.rowCount > 0;
         } catch (error) {
             console.error('Error deleting pet:', error);
