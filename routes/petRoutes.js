@@ -13,11 +13,11 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get a pet by name
-router.get('/:petName', async (req, res) => {
-    const { petName } = req.params;
+// Get a pet by ID
+router.get('/:petId', async (req, res) => {
+    const { petId } = req.params;
     try {
-      const pet = await Pet.findByName(petName); 
+      const pet = await Pet.findById(petId); 
       if (pet) {
         res.json(pet);
       } else {
@@ -30,7 +30,7 @@ router.get('/:petName', async (req, res) => {
   });
   
 // Create a new pet
-router.post('/create', async (req, res) => {
+router.post('/', async (req, res) => {
   const { owner_id, name, species, color, gender } = req.body;
   try {
     const newPet = await Pet.create({ owner_id, name, species, color, gender });
@@ -42,12 +42,12 @@ router.post('/create', async (req, res) => {
 });
 
 
-// Update a pet by name
-router.put('/:petName', async (req, res) => {
-  const { petName } = req.params;
+// Update a pet
+router.put('/:petId', async (req, res) => {
+  const { petId } = req.params;
   const updates = req.body;
   try {
-    const updatedPet = await Pet.update(petName, updates);
+    const updatedPet = await Pet.update(petId, updates);
     res.json(updatedPet);
   } catch (error) {
     console.error('Error updating pet:', error);
@@ -55,11 +55,11 @@ router.put('/:petName', async (req, res) => {
   }
 });
 
-// Delete a pet by ID
-router.delete('/:petName', async (req, res) => {
-  const { petName } = req.params;
+// Delete a pet
+router.delete('/:petId', async (req, res) => {
+  const { petId } = req.params;
   try {
-    const success = await Pet.delete(petName);
+    const success = await Pet.delete(petId);
     if (success) {
       res.json({ message: 'Pet deleted successfully' });
     } else {

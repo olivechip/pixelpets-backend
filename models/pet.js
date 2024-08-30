@@ -15,16 +15,16 @@ class Pet {
         }
     }
 
-    // Find a pet by name
-    static async findByName(petName) {
+    // Find a pet by ID
+    static async findById(petId) {
         try {
-            const result = await db.query('SELECT * FROM pets WHERE name = $1;', [petName]);
+            const result = await db.query('SELECT * FROM pets WHERE id = $1;', [petId]);
             return result.rows[0] || null;
         } catch (error) {
-            console.error('Error finding pet by name:', error);
+            console.error('Error finding pet by ID:', error);
             throw new Error('Database query failed');
         }
-    }
+  }
 
     // Create a new pet
     static async create({ owner_id, name, species, color, gender }) {
@@ -42,15 +42,15 @@ class Pet {
         }
     }
 
-    // Update a pet by name
-    static async update(petName, updates) {
+    // Update a pet
+    static async update(petId, updates) {
         const keys = Object.keys(updates);
         const setClause = keys.map((key, index) => `${key} = $${index + 2}`).join(', ');
-
+    
         try {
             const result = await db.query(
-                `UPDATE pets SET ${setClause}, updated_at = NOW() WHERE name = $1 RETURNING *;`,
-                [petName, ...Object.values(updates)]
+                `UPDATE pets SET ${setClause}, updated_at = NOW() WHERE id = $1 RETURNING *;`,
+                [petId, ...Object.values(updates)]
             );
             return result.rows[0];
         } catch (error) {
@@ -60,9 +60,9 @@ class Pet {
     }
 
     // Delete a pet
-    static async delete(petName) {
+    static async delete(petId) {
         try {
-            const result = await db.query('DELETE FROM pets WHERE name = $1 RETURNING id;', [petName]);
+            const result = await db.query('DELETE FROM pets WHERE id = $1 RETURNING id;', [petId]);
             return result.rowCount > 0;
         } catch (error) {
             console.error('Error deleting pet:', error);
