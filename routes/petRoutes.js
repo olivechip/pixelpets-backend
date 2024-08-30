@@ -13,12 +13,12 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get a pet by ID
-router.get('/:petId', async (req, res) => {
-    const { petId } = req.params;
+// Get a pet by name
+router.get('/:petName', async (req, res) => {
+    const { petName } = req.params;
     try {
       // Assuming you have a findById method in your Pet model
-      const pet = await Pet.findById(petId); 
+      const pet = await Pet.findByName(petName); 
       if (pet) {
         res.json(pet);
       } else {

@@ -15,13 +15,13 @@ class Pet {
         }
     }
 
-    // Find a pet by ID
-    static async findById(petId) {
+    // Find a pet by name
+    static async findByName(petName) {
         try {
-            const result = await db.query('SELECT * FROM pets WHERE id = $1;', [petId]);
+            const result = await db.query('SELECT * FROM pets WHERE name = $1;', [petName]);
             return result.rows[0] || null;
         } catch (error) {
-            console.error('Error finding pet by ID:', error);
+            console.error('Error finding pet by name:', error);
             throw new Error('Database query failed');
         }
     }
