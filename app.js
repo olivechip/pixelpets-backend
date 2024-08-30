@@ -4,6 +4,7 @@ require('dotenv').config()
 const express = require('express');
 const app = express();
 const userRoutes = require('./routes/userRoutes');
+const petRoutes = require('./routes/petRoutes');
 
 app.use(express.json());
 
@@ -13,6 +14,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/users', userRoutes);
+app.use('/pets', petRoutes);
 
 
 

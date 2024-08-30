@@ -4,32 +4,43 @@ const db = require("../db");
 
 class Pet {
 
-  // Create a new pet
-  static async create({ owner_id, name, species, color, gender }) {
-    try {
-      const result = await db.query(
-        `INSERT INTO pets (owner_id, name, species, color, gender, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
-         RETURNING *;`, 
-        [owner_id, name, species, color, gender]
-      );
-      return result.rows[0];
-    } catch (error) {
-      console.error('Error creating pet:', error);
-      throw new Error('Pet creation failed');
+    // Fetch all pets
+    static async findAll(){
+        try {
+            const result = db.query(`SELECT * FROM pets;`);
+            return result;
+        } catch (error) {
+            console.error('Error finding pets:', error);
+            throw new Error('Database query failed');
+        }
     }
-  }
+    
+    // Create a new pet
+    static async create({ owner_id, name, species, color, gender }) {
+        try {
+        const result = await db.query(
+            `INSERT INTO pets (owner_id, name, species, color, gender, created_at, updated_at)
+            VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+            RETURNING *;`, 
+            [owner_id, name, species, color, gender]
+        );
+        return result.rows[0];
+        } catch (error) {
+        console.error('Error creating pet:', error);
+        throw new Error('Pet creation failed');
+        }
+    }
 
-  // Delete a pet
-  static async delete(petId) {
-    try {
-      const result = await db.query('DELETE FROM pets WHERE id = $1 RETURNING id;', [petId]);
-      return result.rowCount > 0;
-    } catch (error) {
-      console.error('Error deleting pet:', error);
-      throw new Error('Pet deletion failed');
+    // Delete a pet
+    static async delete(petId) {
+        try {
+        const result = await db.query('DELETE FROM pets WHERE id = $1 RETURNING id;', [petId]);
+        return result.rowCount > 0;
+        } catch (error) {
+        console.error('Error deleting pet:', error);
+        throw new Error('Pet deletion failed');
+        }
     }
-  }
 
 //   // Feed a pet (instance method)
 //   async feed() {

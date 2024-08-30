@@ -9,7 +9,7 @@ CREATE TABLE users (
 
 CREATE TABLE pets (
     id SERIAL PRIMARY KEY,
-    owner_id INTEGER NOT NULL REFERENCES users(id), -- Link to the users table
+    owner_id INTEGER REFERENCES users(id), -- Link to the users table, NULL means adoption center
     name VARCHAR(20) NOT NULL, 
     species VARCHAR(20) NOT NULL,
     color VARCHAR(20) NOT NULL,
