@@ -13,8 +13,11 @@ VALUES
         NOW(),
         NOW());
 
-INSERT INTO pets (owner_id, name, species, color, gender, created_at, updated_at)
-VALUES  
-        ((SELECT id FROM users WHERE id = 1), 'Fluffy', 'Cat', 'White', 'f', NOW(), NOW()),
-        ((SELECT id FROM users WHERE id = 2), 'Buddy', 'Dog', 'Brown', 'm', NOW(), NOW()),
-        ((SELECT id FROM users WHERE id = 2), 'Goldie', 'Fish', 'Gold', 'f', NOW(), NOW());
+INSERT INTO pets (owner_id, name, species, color, gender, happiness, hunger, last_played, last_fed, created_at, updated_at)
+VALUES 
+    ((SELECT id FROM users WHERE id = 1), 
+        'Fluffy', 'Cat', 'White', 'f', 100, 100, NULL, NULL, NOW(), NOW()),
+    ((SELECT id FROM users WHERE id = 2), 
+        'Buddy', 'Dog', 'Brown', 'm', 50, 50, NOW(), NOW(), NOW(), NOW()),
+    ((SELECT id FROM users WHERE id = 2), 
+        'Goldie', 'Fish', 'Gold', 'f', 70, 50, NOW(), NOW(), NOW(), NOW());

@@ -14,14 +14,10 @@ CREATE TABLE pets (
     species VARCHAR(20) NOT NULL,
     color VARCHAR(20) NOT NULL,
     gender VARCHAR(10) NOT NULL,
+    happiness INTEGER NOT NULL CHECK (happiness >= 0 AND happiness <= 100), 
+    hunger INTEGER NOT NULL CHECK (hunger >= 0 AND hunger <= 100),
+    last_played TIMESTAMP DEFAULT NULL, -- default to null on pet creation
+    last_fed TIMESTAMP DEFAULT NULL, -- default to null on pet creation
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL
 );
-
-CREATE TABLE pet_stats (
-    pet_id  PRIMARY KEY REFERENCES pets(id),
-    happiness INTEGER NOT NULL,
-    hunger INTEGER NOT NULL,
-    last_played TIMESTAMP DEFAULT NULL,
-    last_fed TIMESTAMP DEFAULT NULL
-)
