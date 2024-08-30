@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 /** Collection of related methods for users. */
 
 class User {
+    
     static async findAll(){
         try {
             const result = db.query(`SELECT username, email, created_at, updated_at FROM users;`);
@@ -50,9 +51,7 @@ class User {
     
       static async login({ email, password }) {
         const user = await this.find({ email });
-        console.log(user)
         if (!user || !(await bcrypt.compare(password, user.password))) throw new Error('Invalid credentials');
-    
         try {
           const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
           return { token, user: { id: user.id, username: user.username, email: user.email } };

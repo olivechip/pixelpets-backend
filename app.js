@@ -7,11 +7,14 @@ const userRoutes = require('./routes/userRoutes');
 
 app.use(express.json());
 
-app.use('/users', userRoutes);
-
+// Routes
 app.get('/', (req, res) => {
     res.json('Welcome to Pixelpets!');
 });
+
+app.use('/users', userRoutes);
+
+
 
 // Server info
 const PORT = process.env.PORT || 3000;
