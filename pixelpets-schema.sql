@@ -17,3 +17,11 @@ CREATE TABLE pets (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL
 );
+
+CREATE TABLE pet_stats (
+    pet_id  PRIMARY KEY REFERENCES pets(id),
+    happiness INTEGER NOT NULL,
+    hunger INTEGER NOT NULL,
+    last_played TIMESTAMP DEFAULT NULL,
+    last_fed TIMESTAMP DEFAULT NULL
+)
