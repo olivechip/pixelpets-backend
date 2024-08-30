@@ -16,8 +16,6 @@ app.get('/', (req, res) => {
 app.use('/users', userRoutes);
 app.use('/pets', petRoutes);
 
-
-
 // Server info
 const PORT = process.env.PORT || 3000;
 

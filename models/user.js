@@ -10,7 +10,7 @@ class User {
     // Fetch all users
     static async findAll(){
         try {
-            const result = db.query(`SELECT username, email, created_at, updated_at FROM users;`);
+            const result = db.query(`SELECT id, username, email, created_at, updated_at FROM users;`);
             return result;
         } catch (error) {
             console.error('Error finding users:', error);
@@ -24,7 +24,7 @@ class User {
         const conditions = keys.map((key, index) => `${key} = $${index + 1}`).join(' AND ');
 
         try {
-            const result = await db.query(`SELECT * FROM users WHERE ${conditions}`, Object.values(criteria));
+            const result = await db.query(`SELECT id, username, password, email, created_at, updated_at FROM users WHERE ${conditions}`, Object.values(criteria));
             return result.rows[0] || null;
         } catch (error) {
             console.error('Error finding user:', error);
@@ -34,8 +34,11 @@ class User {
 
     // Register a new user
     static async register({ username, email, password }) {
-        const existingUser = await this.find({ email });
-        if (existingUser) throw new Error('User already exists');
+        let existingUser = await this.find({ email });
+        if (existingUser) throw new Error('Email already exists');
+
+        existingUser = await this.find({ username });
+        if (existingUser) throw new Error('Username already exists');
     
         const hashedPassword = await bcrypt.hash(password, 10);
     
@@ -56,6 +59,7 @@ class User {
     // Log in user
     static async login({ email, password }) {
         const user = await this.find({ email });
+        console.log(user)
         if (!user || !(await bcrypt.compare(password, user.password))) throw new Error('Invalid credentials');
         try {
             const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
