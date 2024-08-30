@@ -7,7 +7,7 @@ router.get('/', async (req, res) => {
   try {
     const pets = await Pet.findAll();
     res.json(pets.rows);
-  } catch (err) {
+  } catch (error) {
     console.error('Error fetching pets:', err);
     res.status(500).json({ error: 'Server Error' });
   }

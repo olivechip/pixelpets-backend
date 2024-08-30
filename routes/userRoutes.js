@@ -1,20 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
+const authRequired = require('../middleware/auth');   
 
 // Test route to check if server works
 router.get('/', async (req, res) => {
     try {
       const users = await User.findAll(); 
       res.json(users.rows);
-    } catch (err) {
+    } catch (error) {
       console.error('Error fetching users:', err);
       res.status(500).json({ error: 'Server Error' }); 
     }
   });
 
 // Get user by ID
-router.get('/:userid', async (req, res) => {
+router.get('/:userid', authRequired, async (req, res) => {
     const { userid } = req.params;
     try {
         const user = await User.find({ id: userid });
@@ -54,9 +55,14 @@ router.post('/login', async (req, res) => {
 });
 
 // Update user by ID
-router.put('/:userid', async (req, res) => {
+router.put('/:userid', authRequired, async (req, res) => {
     const { userid } = req.params;
     const updates = req.body;
+
+    if (req.user.userId !== parseInt(userid)) {
+        return res.status(403).json({ error: 'Forbidden - You can only update your own profile' });
+    }
+
     try {
         const updatedUser = await User.update(userid, updates);
         res.json(updatedUser);
@@ -67,8 +73,13 @@ router.put('/:userid', async (req, res) => {
 });
 
 // Delete user by ID
-router.delete('/:userid', async (req, res) => {
+router.delete('/:userid', authRequired, async (req, res) => {
     const { userid } = req.params;
+
+    if (req.user.userId !== parseInt(userid)) {
+        return res.status(403).json({ error: 'Forbidden - You can only delete your own profile' });
+    }
+
     try {
         const success = await User.delete(userid);
         if (success) {
