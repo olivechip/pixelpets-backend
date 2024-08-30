@@ -13,8 +13,25 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get a pet by ID
+router.get('/:petId', async (req, res) => {
+    const { petId } = req.params;
+    try {
+      // Assuming you have a findById method in your Pet model
+      const pet = await Pet.findById(petId); 
+      if (pet) {
+        res.json(pet);
+      } else {
+        res.status(404).json({ error: 'Pet not found' });
+      }
+    } catch (error) {
+      console.error('Error finding pet:', error);
+      res.status(500).json({ error: 'Server error' });
+    }
+  });
+  
 // Create a new pet
-router.post('/', async (req, res) => {
+router.post('/create', async (req, res) => {
   const { owner_id, name, species, color, gender } = req.body;
   try {
     const newPet = await Pet.create({ owner_id, name, species, color, gender });
@@ -25,22 +42,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Get a pet by ID
-router.get('/:petId', async (req, res) => {
-  const { petId } = req.params;
-  try {
-    // Assuming you have a findById method in your Pet model
-    const pet = await Pet.findById(petId); 
-    if (pet) {
-      res.json(pet);
-    } else {
-      res.status(404).json({ error: 'Pet not found' });
-    }
-  } catch (error) {
-    console.error('Error finding pet:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
 
 // Update a pet by ID (you'll need to define the update logic in your Pet model)
 router.put('/:petId', async (req, res) => {

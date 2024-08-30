@@ -13,6 +13,22 @@ router.get('/', async (req, res) => {
     }
   });
 
+// Get user by ID
+router.get('/:userid', async (req, res) => {
+    const { userid } = req.params;
+    try {
+        const user = await User.find({ id: userid });
+        if (user) {
+            res.json(user);
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (error) {
+        console.error('Error finding user:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 // Register route
 router.post('/register', async (req, res) => {
     const { username, email, password } = req.body;
@@ -34,22 +50,6 @@ router.post('/login', async (req, res) => {
     } catch (error) {
         console.error('Error logging in:', error);
         res.status(401).json({ error: error.message });
-    }
-});
-
-// Get user by ID
-router.get('/:userid', async (req, res) => {
-    const { userid } = req.params;
-    try {
-        const user = await User.find({ id: userid });
-        if (user) {
-            res.json(user);
-        } else {
-            res.status(404).json({ error: 'User not found' });
-        }
-    } catch (error) {
-        console.error('Error finding user:', error);
-        res.status(500).json({ error: 'Server error' });
     }
 });
 
