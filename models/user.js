@@ -93,7 +93,7 @@ class User {
         } 
     }
     
-    // Delete use
+    // Delete user
     static async delete(userId) {
         try {
             const result = await db.query('DELETE FROM users WHERE id = $1 RETURNING id;', [userId]);

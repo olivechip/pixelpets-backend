@@ -30,8 +30,8 @@ class Pet {
     static async create({ owner_id, name, species, color, gender }) {
         try {
             const result = await db.query(
-                `INSERT INTO pets (owner_id, name, species, color, gender, created_at, updated_at)
-                VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+                `INSERT INTO pets (owner_id, name, species, color, gender, happiness, hunger, last_played, last_fed, created_at, updated_at)
+                VALUES ($1, $2, $3, $4, $5, 80, 80, NOW(), NOW(), NOW(), NOW())
                 RETURNING *;`, 
                 [owner_id, name, species, color, gender]
             );
