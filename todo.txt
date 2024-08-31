@@ -1,2 +1,0 @@
-next up: 
-implement feed/play db schema, seed, methods and routes
