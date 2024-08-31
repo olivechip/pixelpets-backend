@@ -70,36 +70,64 @@ class Pet {
         }
     }
 
-//   // Feed a pet (instance method)
-//   async feed() {
-//     // Logic to increase pet's hunger/happiness, update database, etc.
-//     try {
-//       // Assuming you have columns like 'hunger' and 'happiness' in your pets table
-//       await db.query(
-//         'UPDATE pets SET hunger = hunger + 10, happiness = happiness + 5, updated_at = NOW() WHERE id = $1;',
-//         [this.id] 
-//       );
-//       console.log(`${this.name} has been fed!`);
-//     } catch (error) {
-//       console.error('Error feeding pet:', error);
-//       throw new Error('Feeding failed');
-//     }
-//   }
+    // Adoption Methods
+    static async findPetsforAdoption(){
+        try {
+            const result = await db.query('SELECT * FROM pets p JOIN adoption_center ac ON p.id = ac.pet_id;');
+            return result.rows;
+        } catch (error) {
+            console.error('Error finding pets:', error);
+            throw new Error('Database query failed');
+        }
+    }
 
-//   // Play with a pet (instance method)
-//   async play() {
-//     // Logic to increase pet's happiness, maybe decrease hunger, update database
-//     try {
-//       await db.query(
-//         'UPDATE pets SET happiness = happiness + 15, hunger = hunger - 5, updated_at = NOW() WHERE id = $1;',
-//         [this.id]
-//       );
-//       console.log(`You played with ${this.name}!`);
-//     } catch (error) {
-//       console.error('Error playing with pet:', error);
-//       throw new Error('Playing failed');
-//     }
-//   }
+    static async addToAdoption(petId) {
+        try {
+            await db.query('UPDATE pets SET owner_id = NULL WHERE id = $1;', [petId]);
+            await db.query('INSERT INTO adoption_center (pet_id) VALUES ($1);', [petId]);
+        } catch (error) {
+            console.error('Error posting pet:', error);
+            throw new Error('Pet posting failed');
+        }
+    }
+
+    static async removeFromAdoption(petId, newOwnerId) {
+        try {
+            await db.query('UPDATE pets SET owner_id = $1 WHERE id = $2;', [newOwnerId, petId]);
+            await db.query('DELETE FROM adoption_center WHERE pet_id = $1;', [petId]);
+        } catch (error) {
+            console.error('Error adopting pet:', error);
+            throw new Error('Pet adoption failed');
+        }
+    }
+
+    // Feed pet (instance method)
+    async feed() {
+        // Logic to increase pet's hunger/happiness, update database, etc.
+        try {
+            await db.query(
+                'UPDATE pets SET hunger = hunger + 10, happiness = happiness + 5, last_fed = NOW() WHERE id = $1;',
+            [this.id]);
+            console.log(`${this.name} has been fed!`);
+        } catch (error) {
+            console.error('Error feeding pet:', error);
+            throw new Error('Feeding failed');
+        }
+    }
+
+    // Play w/ pet (instance method)
+    async play() {
+        // Logic to increase pet's happiness, update database, etc.
+        try {
+            await db.query(
+                'UPDATE pets SET happiness = happiness + 20, hunger = hunger - 5, last_played = NOW() WHERE id = $1;',
+            [this.id]);
+            console.log(`You played with ${this.name}!`);
+        } catch (error) {
+            console.error('Error playing with pet:', error);
+            throw new Error('Playing failed');
+        }
+    }
 }
 
 module.exports = Pet;
