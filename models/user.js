@@ -59,7 +59,7 @@ class User {
     // Log in user
     static async login({ email, password }) {
         const user = await this.find({ email });
-        console.log(user)
+        // console.log(user) // sanity check
         if (!user || !(await bcrypt.compare(password, user.password))) throw new Error('Invalid credentials');
         try {
             const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });

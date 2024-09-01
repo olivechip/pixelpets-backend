@@ -34,8 +34,10 @@ router.get('/:userid', authRequired, async (req, res) => {
 router.post('/register', async (req, res) => {
     const { username, email, password } = req.body;
     try {
-        const newUser = await User.register({ username, email, password });
-        res.status(201).json(newUser);
+        await User.register({ username, email, password });
+        const { token, user } = await User.login({ email, password }); 
+
+        res.status(201).json({ token, user });
     } catch (error) {
         console.error('Error registering user:', error);
         res.status(400).json({ error: error.message });
