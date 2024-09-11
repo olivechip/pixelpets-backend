@@ -24,7 +24,18 @@ class Pet {
             console.error('Error finding pet by ID:', error);
             throw new Error('Database query failed');
         }
-  }
+    }
+
+    // Find pets by owner
+    static async findByOwnerId(ownerId) {
+        try {
+            const result = await db.query('SELECT * FROM pets WHERE owner_id = $1;', [ownerId]);
+            return result.rows;
+        } catch (error) {
+            console.error('Error finding pets by owner ID:', error);
+            throw new Error('Database query failed');
+        }
+    }
 
     // Create a new pet
     static async create({ owner_id, name, species, color, gender }) {
@@ -67,37 +78,6 @@ class Pet {
         } catch (error) {
             console.error('Error deleting pet:', error);
             throw new Error('Pet deletion failed');
-        }
-    }
-
-    // Adoption Methods
-    static async findPetsforAdoption(){
-        try {
-            const result = await db.query('SELECT * FROM pets p JOIN adoption_center ac ON p.id = ac.pet_id;');
-            return result.rows;
-        } catch (error) {
-            console.error('Error finding pets:', error);
-            throw new Error('Database query failed');
-        }
-    }
-
-    static async addToAdoption(petId) {
-        try {
-            await db.query('UPDATE pets SET owner_id = NULL WHERE id = $1;', [petId]);
-            await db.query('INSERT INTO adoption_center (pet_id) VALUES ($1);', [petId]);
-        } catch (error) {
-            console.error('Error posting pet:', error);
-            throw new Error('Pet posting failed');
-        }
-    }
-
-    static async removeFromAdoption(petId, newOwnerId) {
-        try {
-            await db.query('UPDATE pets SET owner_id = $1 WHERE id = $2;', [newOwnerId, petId]);
-            await db.query('DELETE FROM adoption_center WHERE pet_id = $1;', [petId]);
-        } catch (error) {
-            console.error('Error adopting pet:', error);
-            throw new Error('Pet adoption failed');
         }
     }
 

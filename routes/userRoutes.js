@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
+const Pet = require('../models/pet');
 const authRequired = require('../middleware/auth');   
 
 // Test route to check if server works
@@ -27,6 +28,18 @@ router.get('/:userid', authRequired, async (req, res) => {
     } catch (error) {
         console.error('Error finding user:', error);
         res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Get pets owned by current user
+router.get('/:userId/pets', authRequired, async (req, res) => {
+    const { userId } = req.params;
+    try {
+      const pets = await Pet.findByOwnerId(userId); 
+      res.json(pets);
+    } catch (error) {
+      console.error('Error fetching pets', error);
+      res.status(500).json({ error: 'Server error' });
     }
 });
 

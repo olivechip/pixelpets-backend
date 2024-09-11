@@ -12,37 +12,6 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Server Error' });
   }
 });
-
-// Get all pets in adoption center
-router.get('/adoption', async (req, res) => {
-  try {
-    const pets = await Pet.findPetsforAdoption();
-    if (pets.length === 0){
-      res.json('There are no pets up for adoption at the moment');
-    } else {
-      res.json(pets);
-    }
-  } catch (error) {
-    console.error('Error fetching adoption center pets:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// Get a pet by ID
-router.get('/:petId', async (req, res) => {
-    const { petId } = req.params;
-    try {
-      const pet = await Pet.findById(petId); 
-      if (pet) {
-        res.json(pet);
-      } else {
-        res.status(404).json({ error: 'Pet not found' });
-      }
-    } catch (error) {
-      console.error('Error finding pet:', error);
-      res.status(500).json({ error: 'Server error' });
-    }
-  });
   
 // Create a new pet
 router.post('/', async (req, res) => {
@@ -104,42 +73,18 @@ router.delete('/:petId', async (req, res) => {
   }
 });
 
-
-// Add a pet to the adoption center
-router.post('/:petId/adoption', async (req, res) => {
+// Get a pet by ID
+router.get('/:petId', async (req, res) => {
   const { petId } = req.params;
   try {
-    const pet = await Pet.findById(petId);
-    if (!pet) {
-      return res.status(404).json({ error: 'Pet not found' });
+    const pet = await Pet.findById(petId); 
+    if (pet) {
+      res.json(pet);
+    } else {
+      res.status(404).json({ error: 'Pet not found' });
     }
-
-    if (req.user.userId !== pet.owner_id) {
-      return res.status(403).json({ error: 'Forbidden - You can only post your own pets for adoption' });
-    }    
-    await Pet.addToAdoption(petId);
-    res.json({ message: 'Pet added to adoption center' });
   } catch (error) {
-    console.error('Error adding pet to adoption center:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// Adopt a pet from the adoption center
-router.post('/:petId/adopt', async (req, res) => {
-  const { petId } = req.params;
-  const newOwnerId = req.user.userId;
-  try {
-    const petInAdoptionCenter = await Pet.findById(petId); 
-
-    if (!petInAdoptionCenter || petInAdoptionCenter.owner_id !== null) { 
-      return res.status(400).json({ error: 'This pet is not available for adoption' });
-    }
-
-    await Pet.removeFromAdoption(petId, newOwnerId);
-    res.json({ message: 'Pet adopted successfully' });
-  } catch (error) {
-    console.error('Error adopting pet:', error);
+    console.error('Error finding pet:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });

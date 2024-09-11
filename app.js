@@ -6,6 +6,7 @@ const app = express();
 const authRequired = require('./middleware/auth');
 const userRoutes = require('./routes/userRoutes');
 const petRoutes = require('./routes/petRoutes');
+const poundRoutes = require('./routes/poundRoutes');
 
 app.use(express.json());
 
@@ -17,6 +18,7 @@ app.use('/users', userRoutes);
 
 //Protected Routes
 app.use('/pets', authRequired, petRoutes);
+app.use('/pound', authRequired, poundRoutes);
 
 // Server info
 const PORT = process.env.PORT || 3000;
