@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
       res.json(pets);
     }
   } catch (error) {
-    console.error('Error fetching adoption center pets:', error);
+    console.error('Error fetching pound pets:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });

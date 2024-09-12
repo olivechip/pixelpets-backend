@@ -89,37 +89,38 @@ router.delete('/:petId', async (req, res) => {
   }
 });
 
+// Feed a pet
+router.post('/:petId/feed', async (req, res) => {
+  const { petId } = req.params;
+  try {
+    const petData = await Pet.findById(petId);
+    if (!petData) {
+      return res.status(404).json({ error: 'Pet not found' });
+    }
+    const pet = new Pet(petData);
+    await pet.feed();
+    res.json({ message: 'Pet fed successfully' });
+  } catch (error) {
+    console.error('Error feeding pet:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
-// // Feed a pet
-// router.post('/:petId/feed', async (req, res) => {
-//   const { petId } = req.params;
-//   try {
-//     const pet = await Pet.findById(petId);
-//     if (!pet) {
-//       return res.status(404).json({ error: 'Pet not found' });
-//     }
-//     await pet.feed(); // Call the feed instance method
-//     res.json({ message: 'Pet fed successfully' });
-//   } catch (error) {
-//     console.error('Error feeding pet:', error);
-//     res.status(500).json({ error: 'Server error' });
-//   }
-// });
-
-// // Play with a pet
-// router.post('/:petId/play', async (req, res) => {
-//   const { petId } = req.params;
-//   try {
-//     const pet = await Pet.findById(petId);
-//     if (!pet) {
-//       return res.status(404).json({ error: 'Pet not found' });
-//     }
-//     await pet.play(); // Call the play instance method
-//     res.json({ message: 'Played with pet successfully' });
-//   } catch (error) {
-//     console.error('Error playing with pet:', error);
-//     res.status(500).json({ error: 'Server error' });
-//   }
-// });
+// Play with a pet
+router.post('/:petId/play', async (req, res) => {
+  const { petId } = req.params;
+  try {
+    const petData = await Pet.findById(petId);
+    if (!petData) {
+      return res.status(404).json({ error: 'Pet not found' });
+    }
+    const pet = new Pet(petData);
+    await pet.play();
+    res.json({ message: 'Played with pet successfully' });
+  } catch (error) {
+    console.error('Error playing with pet:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 module.exports = router;

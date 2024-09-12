@@ -3,6 +3,21 @@ const db = require("../db");
 /** Collection of related methods for pets. */
 
 class Pet {
+    // Constructor to initialize a Pet instance
+    constructor(petData) {
+        this.id = petData.id;
+        this.owner_id = petData.owner_id;
+        this.name = petData.name;
+        this.species = petData.species;
+        this.color = petData.color;
+        this.gender = petData.gender;
+        this.happiness = petData.happiness;
+        this.hunger = petData.hunger;
+        this.last_played = petData.last_played;
+        this.last_fed = petData.last_fed;
+        this.created_at = petData.created_at;
+        this.updated_at = petData.updated_at;
+    }
 
     // Fetch all pets
     static async findAll(){
@@ -81,31 +96,39 @@ class Pet {
         }
     }
 
-    // Feed pet (instance method)
-    async feed() {
-        // Logic to increase pet's hunger/happiness, update database, etc.
-        try {
-            await db.query(
-                'UPDATE pets SET hunger = hunger + 10, happiness = happiness + 5, last_fed = NOW() WHERE id = $1;',
-            [this.id]);
-            console.log(`${this.name} has been fed!`);
-        } catch (error) {
-            console.error('Error feeding pet:', error);
-            throw new Error('Feeding failed');
-        }
-    }
-
     // Play w/ pet (instance method)
     async play() {
-        // Logic to increase pet's happiness, update database, etc.
         try {
             await db.query(
-                'UPDATE pets SET happiness = happiness + 20, hunger = hunger - 5, last_played = NOW() WHERE id = $1;',
-            [this.id]);
+                `UPDATE pets 
+                 SET happiness = LEAST(happiness + 20, 100), 
+                     hunger = GREATEST(hunger - 10, 0),
+                     last_played = NOW() 
+                 WHERE id = $1;`,
+                [this.id]
+            );
             console.log(`You played with ${this.name}!`);
         } catch (error) {
             console.error('Error playing with pet:', error);
             throw new Error('Playing failed');
+        }
+    }
+
+    // Feed pet (instance method)
+    async feed() {
+        try {
+            await db.query(
+                `UPDATE pets 
+                 SET hunger = LEAST(hunger + 20, 100), 
+                     happiness = LEAST(happiness + 5, 100), 
+                     last_fed = NOW() 
+                 WHERE id = $1;`,
+                [this.id]
+            );
+            console.log(`${this.name} has been fed!`);
+        } catch (error) {
+            console.error('Error feeding pet:', error);
+            throw new Error('Feeding failed');
         }
     }
 }
