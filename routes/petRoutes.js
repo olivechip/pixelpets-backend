@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Pet = require('../models/pet');
+const authRequired = require('../middleware/auth');   
 
 // Get all pets (for testing/admin purposes, might need authentication later)
 router.get('/', async (req, res) => {
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
 });
   
 // Get a pet by ID
-router.get('/:petId', async (req, res) => {
+router.get('/:petId', authRequired, async (req, res) => {
   const { petId } = req.params;
   try {
     const pet = await Pet.findById(petId); 
@@ -30,7 +31,7 @@ router.get('/:petId', async (req, res) => {
 });
 
 // Create a new pet
-router.post('/', async (req, res) => {
+router.post('/', authRequired, async (req, res) => {
   const { name, species, color, gender } = req.body;
   const owner_id = req.user.userId;
   try {
@@ -43,7 +44,7 @@ router.post('/', async (req, res) => {
 });
 
 // Update a pet
-router.put('/:petId', async (req, res) => {
+router.put('/:petId', authRequired, async (req, res) => {
   const { petId } = req.params;
   const updates = req.body;
   try {
@@ -65,7 +66,7 @@ router.put('/:petId', async (req, res) => {
 });
 
 // Delete a pet
-router.delete('/:petId', async (req, res) => {
+router.delete('/:petId', authRequired, async (req, res) => {
   const { petId } = req.params;
   try {
     const pet = await Pet.findById(petId);
@@ -90,7 +91,7 @@ router.delete('/:petId', async (req, res) => {
 });
 
 // Feed a pet
-router.post('/:petId/feed', async (req, res) => {
+router.post('/:petId/feed', authRequired, async (req, res) => {
   const { petId } = req.params;
   try {
     const petData = await Pet.findById(petId);
@@ -107,7 +108,7 @@ router.post('/:petId/feed', async (req, res) => {
 });
 
 // Play with a pet
-router.post('/:petId/play', async (req, res) => {
+router.post('/:petId/play', authRequired, async (req, res) => {
   const { petId } = req.params;
   try {
     const petData = await Pet.findById(petId);

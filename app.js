@@ -14,10 +14,12 @@ app.use(express.json());
 app.get('/', (req, res) => {
     res.json('Welcome to Pixelpets!');
 });
-app.use('/users', userRoutes);
 
-//Protected Routes
-app.use('/pets', authRequired, petRoutes);
+// Semi-protected Routes
+app.use('/users', userRoutes);
+app.use('/pets', petRoutes);
+
+// Fully Protected Routes
 app.use('/pound', authRequired, poundRoutes);
 
 // Server info
