@@ -1,7 +1,5 @@
 const db = require("../db");
 
-/** Collection of related methods for pets. */
-
 class Pet {
     // Constructor to initialize a Pet instance
     constructor(petData) {
@@ -13,8 +11,7 @@ class Pet {
         this.gender = petData.gender;
         this.happiness = petData.happiness;
         this.hunger = petData.hunger;
-        this.last_played = petData.last_played;
-        this.last_fed = petData.last_fed;
+        this.popularity = petData.popularity;
         this.created_at = petData.created_at;
         this.updated_at = petData.updated_at;
     }
@@ -33,7 +30,18 @@ class Pet {
     // Find a pet by ID
     static async findById(petId) {
         try {
-            const result = await db.query('SELECT * FROM pets WHERE id = $1;', [petId]);
+            const result = await db.query(`
+                SELECT 
+                    p.*,
+                    u.username AS owner_name,
+                    MAX(pi.timestamp) FILTER (WHERE pi.interaction_type = 'play') AS last_played,
+                    MAX(pi.timestamp) FILTER (WHERE pi.interaction_type = 'feed') AS last_fed
+                FROM pets p
+                LEFT JOIN users u ON p.owner_id = u.id
+                LEFT JOIN pet_interactions pi ON p.id = pi.pet_id 
+                WHERE p.id = $1
+                GROUP BY p.id, u.username; 
+            `, [petId]);
             return result.rows[0] || null;
         } catch (error) {
             console.error('Error finding pet by ID:', error);
@@ -44,7 +52,16 @@ class Pet {
     // Find pets by owner
     static async findByOwnerId(ownerId) {
         try {
-            const result = await db.query('SELECT * FROM pets WHERE owner_id = $1;', [ownerId]);
+            const result = await db.query(`
+                SELECT 
+                    p.*,
+                    MAX(pi.timestamp) FILTER (WHERE pi.interaction_type = 'play') AS last_played,
+                    MAX(pi.timestamp) FILTER (WHERE pi.interaction_type = 'feed') AS last_fed
+                FROM pets p
+                LEFT JOIN pet_interactions pi ON p.id = pi.pet_id 
+                WHERE p.owner_id = $1
+                GROUP BY p.id; 
+            `, [ownerId]);
             return result.rows;
         } catch (error) {
             console.error('Error finding pets by owner ID:', error);
@@ -56,8 +73,8 @@ class Pet {
     static async create({ owner_id, name, species, color, gender }) {
         try {
             const result = await db.query(
-                `INSERT INTO pets (owner_id, name, species, color, gender, happiness, hunger, last_played, last_fed, created_at, updated_at)
-                VALUES ($1, $2, $3, $4, $5, 80, 80, NOW(), NOW(), NOW(), NOW())
+                `INSERT INTO pets (owner_id, name, species, color, gender, happiness, hunger, popularity, created_at, updated_at)
+                VALUES ($1, $2, $3, $4, $5, 80, 80, 0, NOW(), NOW())
                 RETURNING *;`, 
                 [owner_id, name, species, color, gender]
             );
@@ -99,36 +116,124 @@ class Pet {
     // Play w/ pet (instance method)
     async play() {
         try {
+            // Check for hunger first
+            if (this.hunger === 0) {
+                throw new Error(`HungerTooLow: ${this.name} is too hungry to play! Feed them first.`);
+            }
+
+            // 1. Insert/update the interaction
             await db.query(
-                `UPDATE pets 
-                 SET happiness = LEAST(happiness + 20, 100), 
-                     hunger = GREATEST(hunger - 10, 0),
-                     last_played = NOW() 
-                 WHERE id = $1;`,
+                `
+                INSERT INTO pet_interactions (pet_id, user_id, interaction_type, timestamp) 
+                VALUES ($1, $2, 'play', NOW())
+                ON CONFLICT (pet_id, user_id, interaction_type) DO UPDATE
+                SET timestamp = NOW();
+                `,
+                [this.id, this.owner_id] 
+            );
+    
+            // 2. Update the pet's stats
+            await db.query(
+                `
+                UPDATE pets 
+                SET happiness = LEAST(happiness + 20, 100), 
+                    hunger = GREATEST(hunger - 10, 0)
+                WHERE id = $1;
+                `,
                 [this.id]
             );
+    
             console.log(`You played with ${this.name}!`);
         } catch (error) {
             console.error('Error playing with pet:', error);
-            throw new Error('Playing failed');
+
+            if (error.message.startsWith('HungerTooLow:')) {
+                throw error;
+            } else {
+                throw new Error('Playing failed'); 
+            }
         }
     }
 
     // Feed pet (instance method)
     async feed() {
         try {
+            // 1. Insert/update the interaction
             await db.query(
-                `UPDATE pets 
-                 SET hunger = LEAST(hunger + 20, 100), 
-                     happiness = LEAST(happiness + 5, 100), 
-                     last_fed = NOW() 
-                 WHERE id = $1;`,
+                `
+                INSERT INTO pet_interactions (pet_id, user_id, interaction_type, timestamp) 
+                VALUES ($1, $2, 'feed', NOW())
+                ON CONFLICT (pet_id, user_id, interaction_type) DO UPDATE
+                SET timestamp = NOW();
+                `,
+                [this.id, this.owner_id] 
+            );
+        
+            // 2. Update the pet's stats
+            await db.query(
+                `
+                UPDATE pets 
+                SET hunger = LEAST(hunger + 20, 100)
+                WHERE id = $1;
+                `,
                 [this.id]
             );
+        
             console.log(`${this.name} has been fed!`);
         } catch (error) {
             console.error('Error feeding pet:', error);
             throw new Error('Feeding failed');
+        }
+    }
+
+    // Pet another pet (instance method)
+    async pet(userId) { 
+        try {
+            // Check if the user has already petted this pet today
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Start of today
+        
+            const result = await db.query(
+                `SELECT * FROM pet_interactions 
+                WHERE pet_id = $1 AND user_id = $2 AND interaction_type = 'pet' 
+                AND timestamp >= $3;`,
+                [this.id, userId, today]
+            );
+            
+            // TESTING! ADD/REMOVE THE '!' WHEN DONE
+            if (result.rows.length !== 0) { // User hasn't petted today
+                // 1. Insert/update the interaction
+                await db.query(
+                    `
+                    INSERT INTO pet_interactions (pet_id, user_id, interaction_type, timestamp)
+                    VALUES ($1, $2, 'pet', NOW())
+                    ON CONFLICT (pet_id, user_id, interaction_type) DO UPDATE
+                    SET timestamp = NOW();
+                    `,
+                    [this.id, userId]
+                );
+        
+                // 2. Update the pet's stats
+                await db.query(
+                    `
+                    UPDATE pets 
+                    SET popularity = popularity + 1 
+                    WHERE id = $1;
+                    `,
+                    [this.id]
+                );
+        
+                console.log(`You petted ${this.name}!`);
+            } else {
+                throw new Error('PettingLimitReached: You can only pet this pet once per day');
+            }
+        } catch (error) {
+            console.error('Error petting pet:', error.message);
+            if (error.message.startsWith('PettingLimitReached:')) {
+                throw error;
+            } else {
+                throw new Error('Petting failed'); 
+            }
         }
     }
 }

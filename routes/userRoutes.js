@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
 const Pet = require('../models/pet');
-const authRequired = require('../middleware/auth');   
+const authRequired = require('../middleware/auth');
 
 // Test route to check if server works
 router.get('/', async (req, res) => {
@@ -16,10 +16,10 @@ router.get('/', async (req, res) => {
   });
 
 // Get user by ID
-router.get('/:userid', authRequired, async (req, res) => {
-    const { userid } = req.params;
+router.get('/:userId', authRequired, async (req, res) => {
+    const { userId } = req.params;
     try {
-        const user = await User.find({ id: userid });
+        const user = await User.find({ id: userId });
         if (user) {
             res.json(user);
         } else {

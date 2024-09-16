@@ -26,7 +26,7 @@ class Pound {
 // Adopt a pet (remove from the adoption center)
     static async adopt(petId, newOwnerId) {
         try {
-            await db.query('UPDATE pets SET owner_id = $1, happiness = 0, hunger = 0 WHERE id = $2;', [newOwnerId, petId]);
+            await db.query('UPDATE pets SET owner_id = $1 WHERE id = $2;', [newOwnerId, petId]);
             await db.query('DELETE FROM adoption_center WHERE pet_id = $1;', [petId]);
         } catch (error) {
             console.error('Error adopting pet:', error);
