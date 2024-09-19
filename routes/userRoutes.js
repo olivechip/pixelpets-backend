@@ -70,16 +70,16 @@ router.post('/login', async (req, res) => {
 });
 
 // Update user by ID
-router.put('/:userid', authRequired, async (req, res) => {
-    const { userid } = req.params;
+router.put('/:userId', authRequired, async (req, res) => {
+    const { userId } = req.params;
     const updates = req.body;
 
-    if (req.user.userId !== parseInt(userid)) {
+    if (req.user.userId !== parseInt(userId)) {
         return res.status(403).json({ error: 'Forbidden - You can only update your own profile' });
     }
 
     try {
-        const updatedUser = await User.update(userid, updates);
+        const updatedUser = await User.update(userId, updates);
         res.json(updatedUser);
     } catch (error) {
         console.error('Error updating user:', error);
@@ -88,23 +88,25 @@ router.put('/:userid', authRequired, async (req, res) => {
 });
 
 // Delete user by ID
-router.delete('/:userid', authRequired, async (req, res) => {
-    const { userid } = req.params;
+router.delete('/:userId', authRequired, async (req, res) => {
+    const { userId } = req.params;
+    const { username, email, password } = req.body;
 
-    if (req.user.userId !== parseInt(userid)) {
+    if (req.user.userId !== parseInt(userId)) {
         return res.status(403).json({ error: 'Forbidden - You can only delete your own profile' });
     }
 
     try {
-        const success = await User.delete(userid);
-        if (success) {
-            res.json({ message: 'User deleted successfully' });
+        const deleted = await User.delete(userId, { username, email, password });
+
+        if (deleted) { 
+            res.status(200).json({ message: 'User deleted successfully' }); 
         } else {
-            res.status(404).json({ error: 'User not found' });
+            res.status(404).json({ error: 'User not found' }); 
         }
     } catch (error) {
         console.error('Error deleting user:', error);
-        res.status(500).json({ error: 'Server error' });
+        res.status(400).json({ error: error.message });
     }
 });
 
