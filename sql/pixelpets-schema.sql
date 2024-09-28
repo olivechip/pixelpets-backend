@@ -14,6 +14,7 @@ CREATE TABLE pets (
     species VARCHAR(20) NOT NULL,
     color VARCHAR(20) NOT NULL,
     gender VARCHAR(10) NOT NULL,
+    img_url VARCHAR(100) NOT NULL,
     happiness INTEGER NOT NULL CHECK (happiness >= 0 AND happiness <= 100), 
     hunger INTEGER NOT NULL CHECK (hunger >= 0 AND hunger <= 100),
     popularity INTEGER NOT NULL DEFAULT 0,
