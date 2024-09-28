@@ -84,7 +84,7 @@ router.delete('/:petId', authRequired, async (req, res) => {
     }
 
     // Check if the user is the owner
-    if (petData.owner_id !== req.user.id) { 
+    if (petData.owner_id !== req.user.userId) { 
       return res.status(403).json({ error: 'You can only delete your own pet' });
     }
 

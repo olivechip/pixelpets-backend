@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 const Pet = require('./pet');
 const Pound = require('./pound');
 
-
 /** Collection of related methods for users. */
 
 class User {
@@ -41,7 +40,7 @@ class User {
 
         existingUser = await this.find({ email });
         if (existingUser) throw new Error('Email already exists');
-
+        
         const hashedPassword = await bcrypt.hash(password, 10);
     
         try {
@@ -78,18 +77,45 @@ class User {
     // Update user
     static async update(userId, updates) {  
         const keys = Object.keys(updates);  
-        
-        // Check if password is being updated and hash it  
-        if (updates.password) {  
-            updates.password = await bcrypt.hash(updates.password, 10);  
-        }  
-    
-        const setClause = keys.map((key, index) => `${key} = $${index + 2}`).join(', ');  
+
+        // Checks that password matches db 
+        try {
+            const user = await this.find({ id: userId });
+            if (!user || !(await bcrypt.compare(updates.currentPassword, user.password))){
+                throw new Error('Invalid password');
+            }
+        } catch (error) {
+            throw error;
+        }
+
+        const allowedKeys = ['username', 'email', 'password']; 
+
+        // Check if password is being updated and hash it
+        if (updates.newPassword) {  
+            updates.password = await bcrypt.hash(updates.newPassword, 10);
+            delete updates.newPassword;
+        } 
+        delete updates.currentPassword;
+
+        // Filter updates for new UPDATE clause
+        const filteredUpdates = {};
+        allowedKeys.forEach(key => {
+            if (updates[key]) {
+                filteredUpdates[key] = updates[key];
+            }
+        });
+        if (updates.password) {
+            filteredUpdates.password = updates.password;
+        }
+
+        const setClause = Object.keys(filteredUpdates)
+            .map((key, index) => `${key} = $${index + 2}`)
+            .join(', ');
     
         try {  
             const result = await db.query(  
                 `UPDATE users SET ${setClause}, updated_at = NOW() WHERE id = $1 RETURNING id, username, email, created_at, updated_at;`,  
-                [userId, ...Object.values(updates)]  
+                [userId, ...Object.values(filteredUpdates)]  
             );  
             return result.rows[0];  
         } catch (error) {  

@@ -201,7 +201,7 @@ class Pet {
             );
             
             // TESTING! ADD/REMOVE THE '!' WHEN DONE
-            if (result.rows.length !== 0) { // User hasn't petted today
+            if (result.rows.length == 0) { // User hasn't petted today
                 // 1. Insert/update the interaction
                 await db.query(
                     `
