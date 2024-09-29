@@ -9,6 +9,7 @@ class Pet {
         this.species = petData.species;
         this.color = petData.color;
         this.gender = petData.gender;
+        this.img_url = petData.img_url;
         this.happiness = petData.happiness;
         this.hunger = petData.hunger;
         this.popularity = petData.popularity;
@@ -70,13 +71,13 @@ class Pet {
     }
 
     // Create a new pet
-    static async create({ owner_id, name, species, color, gender }) {
+    static async create({ owner_id, name, species, color, gender, img_url }) {
         try {
             const result = await db.query(
-                `INSERT INTO pets (owner_id, name, species, color, gender, happiness, hunger, popularity, created_at, updated_at)
-                VALUES ($1, $2, $3, $4, $5, 80, 80, 0, NOW(), NOW())
+                `INSERT INTO pets (owner_id, name, species, color, gender, img_url, happiness, hunger, popularity, created_at, updated_at)
+                VALUES ($1, $2, $3, $4, $5, $6, 80, 80, 0, NOW(), NOW())
                 RETURNING *;`, 
-                [owner_id, name, species, color, gender]
+                [owner_id, name, species, color, gender, img_url]
             );
             return result.rows[0];
         } catch (error) {
@@ -200,8 +201,8 @@ class Pet {
                 [this.id, userId, today]
             );
             
-            // TESTING! ADD/REMOVE THE '!' WHEN DONE
-            if (result.rows.length == 0) { // User hasn't petted today
+            // TESTING! REMOVE THE ! FOR UNLIMITED PETS, ADD ! FOR ONCE A DAY 
+            if (result.rows.length !== 0) { // User hasn't petted today
                 // 1. Insert/update the interaction
                 await db.query(
                     `
