@@ -192,17 +192,16 @@ class Pet {
         try {
             // Check if the user has already petted this pet today
             const today = new Date();
-            today.setHours(0, 0, 0, 0); // Start of today
         
             const result = await db.query(
                 `SELECT * FROM pet_interactions 
                 WHERE pet_id = $1 AND user_id = $2 AND interaction_type = 'pet' 
-                AND timestamp >= $3;`,
-                [this.id, userId, today]
+                AND timestamp >= NOW() - INTERVAL '1 day';`,
+                [this.id, userId]
             );
             
             // TESTING! REMOVE THE ! FOR UNLIMITED PETS, ADD ! FOR ONCE A DAY 
-            if (result.rows.length !== 0) { // User hasn't petted today
+            if (result.rows.length === 0) { // User hasn't petted today
                 // 1. Insert/update the interaction
                 await db.query(
                     `
