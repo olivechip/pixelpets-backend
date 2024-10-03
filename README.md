@@ -37,8 +37,7 @@ These instructions will get you a copy of the project up and running on your loc
 * Node.js
 * Express.js
 * PostgreSQL
-* Custom-built web scraper for Neopets images 
-  ([link]https://github.com/olivechip/neopets_scraping_tool)
+* Custom-built web scraper for Neopets images [https://github.com/olivechip/neopets_scraping_tool]
 
 ## Contributing
 
@@ -46,8 +45,8 @@ Contributions are welcome! If you find any bugs or have suggestions for new feat
 
 ## Contact
 
-* Oliver C - [linked](https://www.linkedin.com/in/ochang89/)
+* Oliver C - [https://www.linkedin.com/in/ochang89/]
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the `LICENSE.txt` file for details.
