@@ -1,8 +1,8 @@
 # Pixelpets - Backend
 
-This repository contains the backend code for Pixelpets, a web application inspired by Neopets. It provides the API endpoints for creating, adopting, and interacting with virtual pets.
+This repository contains the backend code for Pixelpets, a web application inspired by the beloved 90s game, Neopets. It provides the API endpoints for creating, adopting, and interacting with virtual pets.
 
-**Disclaimer:**  I do not own or claim any rights to the Neopets images used in this project. All Neopets images are the property of World of Neopia, Inc.
+**Disclaimer:**  I do not own or claim any rights to the Neopets images used in this project. As of October 2024, all Neopets images are the property of World of Neopia, Inc.
 
 ## Getting Started
 
