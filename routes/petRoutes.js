@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Pet = require('../models/pet');
-const authRequired = require('../middleware/auth');
+const { authRequired } = require('../middleware/auth');
 
 // Get all pets (for testing/admin purposes, might need authentication later)
 router.get('/', async (req, res) => {
@@ -13,16 +13,29 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Server Error' });
   }
 });
-  
+
+// Search for pets by keyword
+router.post('/search', authRequired, async (req, res) => {
+  try {
+    const { keyword } = req.body; 
+    const pets = await Pet.search(keyword);
+    res.json(pets); 
+  } catch (error) {
+    console.error('Error searching for pets:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Get a pet by ID
 router.get('/:petId', authRequired, async (req, res) => {
   const { petId } = req.params;
   try {
-    const pet = await Pet.findById(petId);
-    if (!pet) {
+    const petIdInt = parseInt(petId, 10);
+    const petData = await Pet.find({ id: petIdInt });
+    if (!petData) {
       return res.status(404).json({ error: 'Pet not found' });
     }
-    res.json(pet);
+    res.json(petData);
   } catch (error) {
     console.error('Error finding pet by ID:', error);
     res.status(500).json({ error: 'Server error' });
@@ -56,7 +69,8 @@ router.post('/', authRequired, async (req, res) => {
 router.put('/:petId', authRequired, async (req, res) => {
   const { petId } = req.params;
   try {
-    const petData = await Pet.findById(petId);
+    const petIdInt = parseInt(petId, 10);
+    const petData = await Pet.find({ id: petIdInt });
     if (!petData) {
       return res.status(404).json({ error: 'Pet not found' });
     }
@@ -78,7 +92,8 @@ router.put('/:petId', authRequired, async (req, res) => {
 router.delete('/:petId', authRequired, async (req, res) => {
   const { petId } = req.params;
   try {
-    const petData = await Pet.findById(petId);
+    const petIdInt = parseInt(petId, 10);
+    const petData = await Pet.find({ id: petIdInt });
     if (!petData) {
       return res.status(404).json({ error: 'Pet not found' });
     }
@@ -101,7 +116,8 @@ router.post('/:petId/play', authRequired, async (req, res) => {
   const { petId } = req.params;
   const { userId } = req.user;
   try {
-    const petData = await Pet.findById(petId);
+    const petIdInt = parseInt(petId, 10);
+    const petData = await Pet.find({ id: petIdInt });
     if (!petData) {
       return res.status(404).json({ error: 'Pet not found' });
     }
@@ -130,7 +146,8 @@ router.post('/:petId/feed', authRequired, async (req, res) => {
   const { petId } = req.params;
   const { userId } = req.user;
   try {
-    const petData = await Pet.findById(petId);
+    const petIdInt = parseInt(petId, 10);
+    const petData = await Pet.find({ id: petIdInt });
     if (!petData) {
       return res.status(404).json({ error: 'Pet not found' });
     }
@@ -155,7 +172,8 @@ router.post('/:petId/pet', authRequired, async (req, res) => {
   const { petId } = req.params;
   const { userId } = req.user;
   try {
-    const petData = await Pet.findById(petId);
+    const petIdInt = parseInt(petId, 10);
+    const petData = await Pet.find({ id: petIdInt });
     if (!petData) {
       return res.status(404).json({ error: 'Pet not found' });
     }

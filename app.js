@@ -3,7 +3,7 @@
 require('dotenv').config()
 const express = require('express');
 const app = express();
-const authRequired = require('./middleware/auth');
+const { authRequired } = require('./middleware/auth');
 const userRoutes = require('./routes/userRoutes');
 const petRoutes = require('./routes/petRoutes');
 const poundRoutes = require('./routes/poundRoutes');

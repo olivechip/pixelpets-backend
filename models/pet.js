@@ -28,11 +28,11 @@ class Pet {
         }
     }
 
-    // Find a pet by ID
-    static async findById(petId) {
+    // Search pets by keyword
+    static async search(keyword) {
         try {
-            const result = await db.query(`
-                SELECT 
+            const result = await db.query(
+                `SELECT 
                     p.*,
                     u.username AS owner_name,
                     MAX(pi.timestamp) FILTER (WHERE pi.interaction_type = 'play') AS last_played,
@@ -40,12 +40,38 @@ class Pet {
                 FROM pets p
                 LEFT JOIN users u ON p.owner_id = u.id
                 LEFT JOIN pet_interactions pi ON p.id = pi.pet_id 
-                WHERE p.id = $1
-                GROUP BY p.id, u.username; 
-            `, [petId]);
+                WHERE p.name ILIKE $1 OR p.species ILIKE $1 
+                GROUP BY p.id, u.username;
+                `, [`%${keyword}%`] 
+            );
+            return result.rows; 
+        } catch (error) {
+            console.error('Error searching pets:', error);
+            throw new Error('Database query failed');
+        }
+    }
+
+    // Find pet by criteria
+    static async find(criteria) {
+        const keys = Object.keys(criteria);
+        const conditions = keys.map((key, index) => `p.${key} = $${index + 1}`).join(' AND ');
+        try {
+            const result = await db.query(
+                `SELECT 
+                p.*,
+                u.username AS owner_name,
+                MAX(pi.timestamp) FILTER (WHERE pi.interaction_type = 'play') AS last_played,
+                MAX(pi.timestamp) FILTER (WHERE pi.interaction_type = 'feed') AS last_fed
+                FROM pets p
+                LEFT JOIN users u ON p.owner_id = u.id
+                LEFT JOIN pet_interactions pi ON p.id = pi.pet_id 
+                WHERE ${conditions}
+                GROUP BY p.id, u.username;
+                `, Object.values(criteria)
+            );
             return result.rows[0] || null;
         } catch (error) {
-            console.error('Error finding pet by ID:', error);
+            console.error('Error finding pet:', error);
             throw new Error('Database query failed');
         }
     }

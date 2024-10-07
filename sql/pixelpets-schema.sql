@@ -27,7 +27,7 @@ CREATE TABLE pet_interactions (
     pet_id INTEGER REFERENCES pets(id) ON DELETE CASCADE,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     interaction_type VARCHAR(20) NOT NULL, -- play, feed, or pet
-    timestamp TIMESTAMP NOT NULL DEFAULT NOW(),
+    timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (pet_id, user_id, interaction_type) 
 );
 

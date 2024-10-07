@@ -23,7 +23,7 @@ router.post('/abandon/:petId', async (req, res) => {
     const petId = req.params.petId;
     const userId = req.user.userId;
     try {
-        const pet = await Pet.findById(petId);
+        const pet = await Pet.find({ id: petId });
         if (!pet || pet.owner_id !== userId) {
           return res.status(403).json({ error: 'You can only abandon your own pets' });
         }
@@ -40,7 +40,7 @@ router.post('/adopt/:petId', async (req, res) => {
     const petId = req.params.petId;
     const newOwnerId = req.user.userId;
     try {
-        const pet = await Pet.findById(petId);
+        const pet = await Pet.find({ id: petId });
         if (!pet) {
             return res.status(404).json({ error: 'Pet not found' });
         }

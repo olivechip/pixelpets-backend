@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
 const Pet = require('../models/pet');
-const authRequired = require('../middleware/auth');
+const { authRequired } = require('../middleware/auth');
 
 // Test route to check if server works
 router.get('/', async (req, res) => {
@@ -14,6 +14,18 @@ router.get('/', async (req, res) => {
       res.status(500).json({ error: 'Server Error' }); 
     }
   });
+
+// Search for users by keyword
+router.post('/search', authRequired, async (req, res) => {
+    try {
+      const { keyword } = req.body; 
+      const users = await User.search(keyword);
+      res.json(users); 
+    } catch (error) {
+      console.error('Error searching for users:', error);
+      res.status(500).json({ error: 'Server error' });
+    }
+});
 
 // Get user by ID
 router.get('/:userId', authRequired, async (req, res) => {
@@ -35,11 +47,11 @@ router.get('/:userId', authRequired, async (req, res) => {
 router.get('/:userId/pets', authRequired, async (req, res) => {
     const { userId } = req.params;
     try {
-      const pets = await Pet.findByOwnerId(userId); 
-      res.json(pets);
+        const pets = await Pet.findByOwnerId(userId); 
+        res.json(pets);
     } catch (error) {
-      console.error('Error fetching pets', error);
-      res.status(500).json({ error: 'Server error' });
+        console.error('Error fetching pets', error);
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
@@ -47,10 +59,8 @@ router.get('/:userId/pets', authRequired, async (req, res) => {
 router.post('/register', async (req, res) => {
     const { username, email, password } = req.body;
     try {
-        await User.register({ username, email, password });
-        const { token, user } = await User.login({ email, password }); 
-
-        res.status(201).json({ token, user });
+        const { token, refreshToken, user } = await User.register({ username, email, password });
+        res.status(201).json({ token, refreshToken, user });
     } catch (error) {
         console.error('Error registering user:', error);
         res.status(400).json({ error: error.message });
@@ -61,8 +71,8 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     try {
-        const { token, user } = await User.login({ email, password });
-        res.json({ token, user });
+        const { token, refreshToken, user } = await User.login({ email, password });
+        res.json({ token, refreshToken, user });
     } catch (error) {
         console.error('Error logging in:', error);
         res.status(401).json({ error: error.message });

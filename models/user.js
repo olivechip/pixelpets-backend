@@ -1,8 +1,9 @@
 const db = require("../db");
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const Pet = require('./pet');
 const Pound = require('./pound');
+const { generateToken, generateRefreshToken } = require('../middleware/auth');
+
 
 /** Collection of related methods for users. */
 
@@ -15,6 +16,22 @@ class User {
             return result;
         } catch (error) {
             console.error('Error finding users:', error);
+            throw new Error('Database query failed');
+        }
+    }
+
+    // Search users by keyword
+    static async search(keyword) {
+        try {
+            const result = await db.query(
+                `SELECT * 
+                FROM users 
+                WHERE username ILIKE $1`, 
+                [`%${keyword}%`] 
+            );
+            return result.rows;
+        } catch (error) {
+            console.error('Error searching users:', error);
             throw new Error('Database query failed');
         }
     }
@@ -50,7 +67,12 @@ class User {
                 RETURNING id, username, email, created_at, updated_at;`,
                 [username, email, hashedPassword]
             );
-            return result.rows[0];
+
+            const user = result.rows[0];
+            const token = generateToken(user);
+            const refreshToken = generateRefreshToken(user);
+
+            return { token, refreshToken, user };
         } catch (error) {
             console.error('Error registering user:', error);
             throw new Error('Registration failed');
@@ -66,8 +88,17 @@ class User {
         }
 
         try {
-            const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-            return { token, user: { id: user.id, username: user.username, email: user.email } };
+            const token = generateToken(user);
+            const refreshToken = generateRefreshToken(user);
+            return { 
+                token, 
+                refreshToken, 
+                user: { 
+                    id: user.id, 
+                    username: user.username, 
+                    email: user.email 
+                } 
+            };
         } catch (error) {
             console.error('Error logging in:', error);
             throw new Error('Login failed');
@@ -134,7 +165,6 @@ class User {
             }
 
             const userPets = await Pet.findByOwnerId(userId);
-            console.log(userPets)
             const result = await db.query('DELETE FROM users WHERE id = $1 RETURNING id;', [userId]);
             if (result.rowCount > 0) {
                 for (const pet of userPets) {
