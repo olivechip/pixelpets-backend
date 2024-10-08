@@ -2,8 +2,7 @@ const db = require("../db");
 const bcrypt = require('bcrypt');
 const Pet = require('./pet');
 const Pound = require('./pound');
-const { generateToken, generateRefreshToken } = require('../middleware/auth');
-
+const { generateToken, generateRefreshToken } = require('../routes/authService');
 
 /** Collection of related methods for users. */
 
@@ -69,10 +68,16 @@ class User {
             );
 
             const user = result.rows[0];
-            const token = generateToken(user);
-            const refreshToken = generateRefreshToken(user);
+            const { token, expirationTime } = generateToken(user);
+            const { refreshToken, refreshTokenExpirationTime } = generateRefreshToken(user);
 
-            return { token, refreshToken, user };
+            return { 
+                token, 
+                refreshToken, 
+                expirationTime, 
+                refreshTokenExpirationTime,
+                user
+            };
         } catch (error) {
             console.error('Error registering user:', error);
             throw new Error('Registration failed');
@@ -88,11 +93,13 @@ class User {
         }
 
         try {
-            const token = generateToken(user);
-            const refreshToken = generateRefreshToken(user);
+            const { token, expirationTime } = generateToken(user);
+            const { refreshToken, refreshTokenExpirationTime } = generateRefreshToken(user);
             return { 
                 token, 
                 refreshToken, 
+                expirationTime, 
+                refreshTokenExpirationTime,
                 user: { 
                     id: user.id, 
                     username: user.username, 

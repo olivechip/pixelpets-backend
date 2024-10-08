@@ -2,9 +2,8 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
 const Pet = require('../models/pet');
-const { authRequired } = require('../middleware/auth');
 
-// Test route to check if server works
+// Get all users (for testing/admin purposes, might need authentication later)
 router.get('/', async (req, res) => {
     try {
       const users = await User.findAll(); 
@@ -16,7 +15,7 @@ router.get('/', async (req, res) => {
   });
 
 // Search for users by keyword
-router.post('/search', authRequired, async (req, res) => {
+router.post('/search', async (req, res) => {
     try {
       const { keyword } = req.body; 
       const users = await User.search(keyword);
@@ -28,7 +27,7 @@ router.post('/search', authRequired, async (req, res) => {
 });
 
 // Get user by ID
-router.get('/:userId', authRequired, async (req, res) => {
+router.get('/:userId', async (req, res) => {
     const { userId } = req.params;
     try {
         const user = await User.find({ id: userId });
@@ -44,7 +43,7 @@ router.get('/:userId', authRequired, async (req, res) => {
 });
 
 // Get pets owned by current user
-router.get('/:userId/pets', authRequired, async (req, res) => {
+router.get('/:userId/pets', async (req, res) => {
     const { userId } = req.params;
     try {
         const pets = await Pet.findByOwnerId(userId); 
@@ -55,32 +54,8 @@ router.get('/:userId/pets', authRequired, async (req, res) => {
     }
 });
 
-// Register route
-router.post('/register', async (req, res) => {
-    const { username, email, password } = req.body;
-    try {
-        const { token, refreshToken, user } = await User.register({ username, email, password });
-        res.status(201).json({ token, refreshToken, user });
-    } catch (error) {
-        console.error('Error registering user:', error);
-        res.status(400).json({ error: error.message });
-    }
-});
-
-// Login route
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const { token, refreshToken, user } = await User.login({ email, password });
-        res.json({ token, refreshToken, user });
-    } catch (error) {
-        console.error('Error logging in:', error);
-        res.status(401).json({ error: error.message });
-    }
-});
-
 // Update user by ID
-router.put('/:userId', authRequired, async (req, res) => {
+router.put('/:userId', async (req, res) => {
     const { userId } = req.params;
     const updates = req.body;
 
@@ -98,7 +73,7 @@ router.put('/:userId', authRequired, async (req, res) => {
 });
 
 // Delete user by ID
-router.delete('/:userId', authRequired, async (req, res) => {
+router.delete('/:userId', async (req, res) => {
     const { userId } = req.params;
     const { username, email, password } = req.body;
 

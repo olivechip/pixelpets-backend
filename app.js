@@ -3,10 +3,12 @@
 require('dotenv').config()
 const express = require('express');
 const app = express();
-const { authRequired } = require('./middleware/auth');
+
+const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const petRoutes = require('./routes/petRoutes');
 const poundRoutes = require('./routes/poundRoutes');
+const { authRequired } = require('./middleware/auth');
 
 app.use(express.json());
 
@@ -14,12 +16,11 @@ app.use(express.json());
 app.get('/', (req, res) => {
     res.json('Welcome to Pixelpets!');
 });
-
-// Semi-protected Routes
-app.use('/users', userRoutes);
-app.use('/pets', petRoutes);
+app.use('/auth', authRoutes);
 
 // Fully Protected Routes
+app.use('/users', authRequired, userRoutes);
+app.use('/pets', authRequired, petRoutes);
 app.use('/pound', authRequired, poundRoutes);
 
 // Server info
