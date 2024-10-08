@@ -1,6 +1,6 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
+    username VARCHAR(50) UNIQUE NOT NULL CHECK (LENGTH(username) >= 3),
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     created_at TIMESTAMP NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE users (
 CREATE TABLE pets (
     id SERIAL PRIMARY KEY,
     owner_id INTEGER REFERENCES users(id) ON DELETE SET NULL, -- Link to the users table, NULL means adoption center
-    name VARCHAR(20) UNIQUE NOT NULL, 
+    name VARCHAR(50) UNIQUE NOT NULL CHECK (LENGTH(username) >= 3), 
     species VARCHAR(20) NOT NULL,
     color VARCHAR(20) NOT NULL,
     gender VARCHAR(10) NOT NULL,
