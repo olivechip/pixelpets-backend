@@ -4,7 +4,7 @@ const { Client } = require('pg');
 require('dotenv').config();
 
 // Determine the database URI based on the environment
-let DBI_URI; 
+let DB_URI; 
 
 if (process.env.NODE_ENV === 'test') {
     // Use the test database URI if in test mode
