@@ -40,7 +40,7 @@ class Pet {
                 FROM pets p
                 LEFT JOIN users u ON p.owner_id = u.id
                 LEFT JOIN pet_interactions pi ON p.id = pi.pet_id 
-                WHERE p.name ILIKE $1 OR p.species ILIKE $1 
+                WHERE p.name ILIKE $1 OR p.species ILIKE $1 OR p.color ILIKE $1
                 GROUP BY p.id, u.username;
                 `, [`%${keyword}%`] 
             );
