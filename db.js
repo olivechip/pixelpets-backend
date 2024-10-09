@@ -15,26 +15,22 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 // Configuration for db connection
-const db = new Client(
-    process.env.NODE_ENV === 'development'
-        ?   {
-                host: '/var/run/postgresql', // Specify host for local development
-                database: DB_URI, // Use the database URI
-        }
-        :   {
-                connectionString: DB_URI, // Use connection string for production/testing
-                ssl: {
-                    rejectUnauthorized: false, // Render uses self-signed certificates
-                },
-            }
-);
+const dbConfig = {
+    host: process.env.NODE_ENV === 'development' ? '/var/run/postgresql' : undefined,
+    connectionString: process.env.NODE_ENV === 'development' ? undefined : DB_URI,
+    ssl: process.env.NODE_ENV !== 'development' ? { rejectUnauthorized: false } : undefined,
+};
+
+const db = new Client(dbConfig);
 
 const connectDB = async () => {
     try {
         await db.connect();
         console.log('Connected to the database!');
+        return db;
     } catch (err) {
         console.error('Connection error', err.stack);
+        throw err;
     }
 };
 
@@ -185,4 +181,4 @@ initializeDB();
 module.exports = db;
 
 // Comment out for dev
-module.exports = { executeSQL, initializeDB };
+module.exports = { db, executeSQL, initializeDB };
