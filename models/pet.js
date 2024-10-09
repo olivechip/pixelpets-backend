@@ -20,7 +20,17 @@ class Pet {
     // Fetch all pets
     static async findAll(){
         try {
-            const result = db.query(`SELECT * FROM pets;`);
+            const result = db.query(
+                `SELECT 
+                    p.*,
+                    u.username AS owner_name,
+                    MAX(pi.timestamp) FILTER (WHERE pi.interaction_type = 'play') AS last_played,
+                    MAX(pi.timestamp) FILTER (WHERE pi.interaction_type = 'feed') AS last_fed
+                FROM pets p
+                LEFT JOIN users u ON p.owner_id = u.id
+                LEFT JOIN pet_interactions pi ON p.id = pi.pet_id 
+                GROUP BY p.id, u.username;
+                `);
             return result;
         } catch (error) {
             console.error('Error finding pets:', error);

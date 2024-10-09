@@ -23,10 +23,12 @@ const db = new Client(
         }
         :   {
                 connectionString: DB_URI, // Use connection string for production/testing
-        }
+                ssl: {
+                    rejectUnauthorized: false, // Render uses self-signed certificates
+                },
+            }
 );
 
-// Comment out for dev - start
 const connectDB = async () => {
     try {
         await db.connect();
@@ -36,7 +38,8 @@ const connectDB = async () => {
     }
 };
 
-// Function to execute SQL commands
+// Comment out for dev - start
+// // Function to execute SQL commands
 const executeSQL = async (query) => {
     try {
         const res = await db.query(query);
@@ -44,6 +47,15 @@ const executeSQL = async (query) => {
     } catch (err) {
         console.error('SQL error', err.stack);
     }
+};
+
+// Function to drop tables
+const dropTables = async () => {
+    const dropAllTables = `
+        DROP TABLE IF EXISTS users, pets, pet_interactions, adoption_center;
+    `;
+
+    await executeSQL(dropAllTables);
 };
 
 // Function to create tables
@@ -99,31 +111,63 @@ const createTables = async () => {
 // Function to seed initial data
 const seedData = async () => {
     const seedUsers = `
-    INSERT INTO users (username, password, email, created_at, updated_at)
-    VALUES 
-        ('user1', '$2b$12$AZH7virni5jlTTiGgEg4zu3lSvAw68qVEfSIOjJ3RqtbJbdW/Oi5q', 'user1@email.com', NOW(), NOW())
-        ON CONFLICT (username) DO NOTHING;
-    INSERT INTO users (username, password, email, created_at, updated_at)
-    VALUES 
-        ('user2', '$2b$12$AZH7virni5jlTTiGgEg4zu3lSvAw68qVEfSIOjJ3RqtbJbdW/Oi5q', 'user2@email.com', NOW(), NOW())
-        ON CONFLICT (username) DO NOTHING;`;
-
+        INSERT INTO users (username, password, email, created_at, updated_at)
+        VALUES 
+            ('user1', '$2b$12$AZH7virni5jlTTiGgEg4zu3lSvAw68qVEfSIOjJ3RqtbJbdW/Oi5q', 'user1@email.com', NOW(), NOW()),
+            ('user2', '$2b$12$AZH7virni5jlTTiGgEg4zu3lSvAw68qVEfSIOjJ3RqtbJbdW/Oi5q', 'user2@email.com', NOW(), NOW());
+    `;
     await executeSQL(seedUsers);
 
     const seedPets = `
-    INSERT INTO pets (owner_id, name, species, color, gender, img_url, happiness, hunger, popularity, created_at, updated_at)
-    VALUES 
-        (1, 'Fluffy', 'kougra', 'yellow', 'female', '/src/assets/pixelpets/colored/kougra_yellow_female.png', 100, 100, 0, NOW(), NOW()),
-        (2, 'Buddy', 'techo', 'blue', 'male', '/src/assets/pixelpets/colored/techo_blue_male.png', 50, 50, 0, NOW(), NOW()),
-        (2, 'Goldie', 'vandagyre', 'green', 'female', '/src/assets/pixelpets/colored/vandagyre_green_female.png', 70, 50, 0, NOW(), NOW())
-        ON CONFLICT (name) DO NOTHING;`;
-
+        INSERT INTO pets (owner_id, name, species, color, gender, img_url, happiness, hunger, popularity, created_at, updated_at)
+        VALUES 
+            (1, 'Fluffy', 'kougra', 'yellow', 'female', '/src/assets/pixelpets/colored/kougra_yellow_female.png', 100, 100, 0, NOW(), NOW()),
+            (2, 'Buddy', 'techo', 'blue', 'male', '/src/assets/pixelpets/colored/techo_blue_male.png', 50, 50, 0, NOW(), NOW()),
+            (2, 'Goldie', 'vandagyre', 'green', 'female', '/src/assets/pixelpets/colored/vandagyre_green_female.png', 70, 50, 0, NOW(), NOW()),
+            (NULL, 'Patches', 'moehog', 'red', 'male', '/src/assets/pixelpets/colored/moehog_red_male.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()), 
+            (NULL, 'Whiskers', 'xweetok', 'blue', 'female', '/src/assets/pixelpets/colored/xweetok_blue_female.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
+            (NULL, 'Spot', 'nimmo', 'blue', 'male', '/src/assets/pixelpets/colored/nimmo_blue_male.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()), 
+            (NULL, 'Mittens', 'scorchio', 'green', 'female', '/src/assets/pixelpets/colored/scorchio_green_female.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
+            (NULL, 'Bubbles', 'gelert', 'yellow', 'male', '/src/assets/pixelpets/colored/gelert_yellow_male.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
+            (NULL, 'Tweety', 'jubjub', 'yellow', 'female', '/src/assets/pixelpets/colored/jubjub_yellow_female.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
+            (NULL, 'Hammy', 'kyrii', 'red', 'male', '/src/assets/pixelpets/colored/kyrii_red_male.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
+            (NULL, 'Slither', 'kougra', 'red', 'male', '/src/assets/pixelpets/colored/kougra_red_male.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
+            (NULL, 'Hopper', 'ogrin', 'yellow', 'female', '/src/assets/pixelpets/colored/ogrin_yellow_female.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
+            (NULL, 'Spike', 'kacheek', 'green', 'male', '/src/assets/pixelpets/colored/kacheek_green_male.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW());
+    `;
     await executeSQL(seedPets);
+
+    const seedPIs = `
+        INSERT INTO pet_interactions (pet_id, user_id, interaction_type, timestamp)
+        VALUES 
+            (1, 1, 'feed', '2024-09-15 10:30:00+00'),
+            (1, 1, 'play', '2024-09-13 18:20:00+00'),
+            (2, 2, 'play', '2024-09-15 08:15:00+00'),
+            (3, 2, 'feed', '2024-09-13 14:00:00+00');
+    `;
+    await executeSQL(seedPIs);
+
+    const seedAdoptionCenter = `
+        INSERT INTO adoption_center (pet_id, posted_at) 
+        VALUES 
+            (4, NOW()), 
+            (5, NOW()),
+            (6, NOW()), 
+            (7, NOW()),
+            (8, NOW()),
+            (9, NOW()),
+            (10, NOW()),
+            (11, NOW()),
+            (12, NOW()),
+            (13, NOW());
+    `;
+    await executeSQL(seedAdoptionCenter);
 };
 
 // Initialize the database
 const initializeDB = async () => {
     await connectDB();
+    await dropTables();
     await createTables();
     await seedData();
 };
@@ -137,4 +181,4 @@ initializeDB();
 module.exports = db;
 
 // Comment out for dev
-module.exports = { executeSQL, initializeDB };
+// module.exports = { executeSQL, initializeDB };

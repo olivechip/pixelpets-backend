@@ -4,6 +4,9 @@ require('dotenv').config()
 const express = require('express');
 const app = express();
 
+const User = require('./models/user');
+const Pet = require('./models/pet');
+
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const petRoutes = require('./routes/petRoutes');
@@ -17,12 +20,23 @@ app.get('/', (req, res) => {
     res.json('Welcome to Pixelpets!');
 });
 
+app.get('/admin', async (req, res) => {
+  try {
+    const users = await User.findAll(); 
+    const pets = await Pet.findAll();
+    res.json([users.rows, pets.rows]);
+  } catch (error) {
+    console.error('Error fetching data:', err);
+    res.status(500).json({ error: 'Server Error' }); 
+  }
+});
+
+app.use('/auth', authRoutes);
+
 // Test Route
 app.get('/auth', async (req, res) => {
   res.status(200).json('You have reach the /auth route');
 });
-
-app.use('/auth', authRoutes);
 
 // Fully Protected Routes
 app.use('/users', authRequired, userRoutes);
