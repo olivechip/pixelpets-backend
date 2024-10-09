@@ -7,6 +7,7 @@ CREATE DATABASE pixelpets;
 
 \i pixelpets-schema.sql
 \i pixelpets-seed.sql
+\i decrease_pet_stats.sql
 
 \echo 'Delete and recreate pixelpets_test db?'
 \prompt 'Return for yes or control-C to cancel > ' foo
@@ -16,3 +17,4 @@ CREATE DATABASE pixelpets_test;
 \connect pixelpets_test
 
 \i pixelpets-schema.sql
+\i decrease_pet_stats.sql
