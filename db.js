@@ -181,4 +181,4 @@ initializeDB();
 module.exports = db;
 
 // Comment out for dev
-// module.exports = { executeSQL, initializeDB };
+module.exports = { executeSQL, initializeDB };
