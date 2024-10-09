@@ -26,7 +26,7 @@ app.get('/admin', async (req, res) => {
     const pets = await Pet.findAll();
     res.json([users.rows, pets.rows]);
   } catch (error) {
-    console.error('Error fetching data:', err);
+    console.error('Error fetching data:', error);
     res.status(500).json({ error: 'Server Error' }); 
   }
 });
