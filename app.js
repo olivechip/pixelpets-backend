@@ -16,8 +16,9 @@ const { authRequired } = require('./middleware/auth');
 app.use(express.json());
 
 // Unprotected Routes
-app.get('/', (req, res) => {
-    res.json('Welcome to Pixelpets!');
+app.get('/', async (req, res) => {
+    const users = await User.findAll(); 
+    res.json(users.rows, 'Welcome to Pixelpets!');
 });
 
 app.get('/admin', async (req, res) => {
