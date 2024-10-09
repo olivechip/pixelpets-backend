@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
 });
 
 // Test Route
-router.get('/auth', async (req, res) => {
+app.get('/auth', async (req, res) => {
   res.status(200).json('You have reach the /auth route');
 });
 
