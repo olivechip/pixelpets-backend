@@ -56,6 +56,7 @@ const dropTables = async () => {
     `;
 
     await executeSQL(dropAllTables);
+    console.log('Tables dropped!');
 };
 
 // Function to create tables
@@ -106,6 +107,7 @@ const createTables = async () => {
     await executeSQL(createPetsTable);
     await executeSQL(createPetInteractionsTable);
     await executeSQL(createAdoptionCenterTable);
+    console.log('Tables created!');
 };
 
 // Function to seed initial data
@@ -162,6 +164,7 @@ const seedData = async () => {
             (13, NOW());
     `;
     await executeSQL(seedAdoptionCenter);
+    console.log('Data seeded!');
 };
 
 // Initialize the database
@@ -170,6 +173,7 @@ const initializeDB = async () => {
     await dropTables();
     await createTables();
     await seedData();
+    console.log(`DB initialized on ${DB_URI}!`)
 };
 
 initializeDB();
