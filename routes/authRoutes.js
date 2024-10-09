@@ -5,6 +5,11 @@ const { generateToken, generateRefreshToken } = require('./authService');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET;
 
+// Test Route
+router.get('/', async (req, res) => {
+    res.status(200).json('You have reach the /auth route');
+});
+
 // Register route
 router.post('/register', async (req, res) => {
     const { username, email, password } = req.body;

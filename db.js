@@ -17,12 +17,12 @@ if (process.env.NODE_ENV === 'test') {
 // Configuration for db connection
 const db = new Client(
     process.env.NODE_ENV === 'development'
-        ? {
-            host: '/var/run/postgresql', // Specify host for local development
-            database: DB_URI, // Use the database URI determined earlier
+        ?   {
+                host: '/var/run/postgresql', // Specify host for local development
+                database: DB_URI, // Use the database URI
         }
-        : {
-            connectionString: DB_URI, // Use connection string for production/testing
+        :   {
+                connectionString: DB_URI, // Use connection string for production/testing
         }
 );
 

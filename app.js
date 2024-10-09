@@ -16,12 +16,18 @@ app.use(express.json());
 app.get('/', (req, res) => {
     res.json('Welcome to Pixelpets!');
 });
+
+// Test Route
+router.get('/auth', async (req, res) => {
+  res.status(200).json('You have reach the /auth route');
+});
+
 app.use('/auth', authRoutes);
 
 // Fully Protected Routes
 app.use('/users', authRequired, userRoutes);
 app.use('/pets', authRequired, petRoutes);
-app.use('/pound', authRequired, poundRoutes);
+app.use('/pound', poundRoutes);
 
 // Server info
 const PORT = process.env.PORT || 3000;
