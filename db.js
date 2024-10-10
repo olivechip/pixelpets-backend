@@ -14,8 +14,8 @@ if (process.NODE_ENV === 'development') {
     });
 } else {
     db = new Client({
-        host: 'postgresql://pixelpets_psql_user:98UgtNP26mX4fXziX3SC5jSfjdMlGKoh@dpg-cs45id5umphs73d7a6eg-a/pixelpets_psql',
-        database: 'pixelpets_psql'
+        connectionString: 'postgres://pixelpets_psql_user:98UgtNP26mX4fXziX3SC5jSfjdMlGKoh@dpg-cs45id5umphs73d7a6eg-a:5432/pixelpets_psql',
+        ssl: { rejectUnauthorized: false }
     });
 }
 
