@@ -10,4 +10,4 @@ END;
 $$;
 
 -- Schedule the procedure using pg_cron to run every minute
-SELECT cron.schedule('*/1 * * * *', 'CALL decrease_pet_stats();');
+-- SELECT cron.schedule('*/1 * * * *', 'CALL decrease_pet_stats();');

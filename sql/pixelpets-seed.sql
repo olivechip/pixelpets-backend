@@ -15,19 +15,19 @@ VALUES
 
 INSERT INTO pets (owner_id, name, species, color, gender, img_url, happiness, hunger, popularity, created_at, updated_at)
 VALUES 
-        ((SELECT id FROM users WHERE id = 1), 'Fluffy', 'kougra', 'yellow', 'female', '/src/assets/pixelpets/colored/kougra_yellow_female.png', 100, 100, 0, NOW(), NOW()),
-        ((SELECT id FROM users WHERE id = 2), 'Buddy', 'techo', 'blue', 'male', '/src/assets/pixelpets/colored/techo_blue_male.png', 50, 50, 0, NOW(), NOW()),
-        ((SELECT id FROM users WHERE id = 2), 'Goldie', 'vandagyre', 'green', 'female', '/src/assets/pixelpets/colored/vandagyre_green_female.png', 70, 50, 0, NOW(), NOW()),
-        (NULL, 'Patches', 'moehog', 'red', 'male', '/src/assets/pixelpets/colored/moehog_red_male.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()), 
-        (NULL, 'Whiskers', 'xweetok', 'blue', 'female', '/src/assets/pixelpets/colored/xweetok_blue_female.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
-        (NULL, 'Spot', 'nimmo', 'blue', 'male', '/src/assets/pixelpets/colored/nimmo_blue_male.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()), 
-        (NULL, 'Mittens', 'scorchio', 'green', 'female', '/src/assets/pixelpets/colored/scorchio_green_female.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
-        (NULL, 'Bubbles', 'gelert', 'yellow', 'male', '/src/assets/pixelpets/colored/gelert_yellow_male.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
-        (NULL, 'Tweety', 'jubjub', 'yellow', 'female', '/src/assets/pixelpets/colored/jubjub_yellow_female.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
-        (NULL, 'Hammy', 'kyrii', 'red', 'male', '/src/assets/pixelpets/colored/kyrii_red_male.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
-        (NULL, 'Slither', 'kougra', 'red', 'male', '/src/assets/pixelpets/colored/kougra_red_male.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
-        (NULL, 'Hopper', 'ogrin', 'yellow', 'female', '/src/assets/pixelpets/colored/ogrin_yellow_female.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
-        (NULL, 'Spike', 'kacheek', 'green', 'male', '/src/assets/pixelpets/colored/kacheek_green_male.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW());
+        ((SELECT id FROM users WHERE id = 1), 'Fluffy', 'kougra', 'yellow', 'female', '/public/images/pixelpets/kougra/happy_female_yellow_kougra.png', 100, 100, 0, NOW(), NOW()),
+        ((SELECT id FROM users WHERE id = 2), 'Buddy', 'techo', 'blue', 'male', '/public/images/pixelpets/techo/happy_male_blue_techo.png', 50, 50, 0, NOW(), NOW()),
+        ((SELECT id FROM users WHERE id = 2), 'Goldie', 'vandagyre', 'green', 'female', '/public/images/pixelpets/vandagyre/happy_female_green_vandagyre.png', 70, 50, 0, NOW(), NOW()),
+        (NULL, 'Patches', 'moehog', 'red', 'male', '/public/images/pixelpets/moehog/happy_male_red_moehog.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()), 
+        (NULL, 'Whiskers', 'xweetok', 'blue', 'female', '/public/images/pixelpets/xweetok/happy_female_blue_xweetok.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
+        (NULL, 'Spot', 'nimmo', 'blue', 'male', '/public/images/pixelpets/nimmo/happy_male_blue_nimmo.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()), 
+        (NULL, 'Mittens', 'scorchio', 'green', 'female', '/public/images/pixelpets/scorchio/happy_female_green_scorchio.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
+        (NULL, 'Bubbles', 'gelert', 'yellow', 'male', '/public/images/pixelpets/gelert/happy_male_yellow_gelert.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
+        (NULL, 'Tweety', 'jubjub', 'yellow', 'female', '/public/images/pixelpets/jubjub/happy_female_yellow_jubjub.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
+        (NULL, 'Hammy', 'kyrii', 'red', 'male', '/public/images/pixelpets/kyrii/happy_male_red_kyrii.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
+        (NULL, 'Slither', 'kougra', 'red', 'male', '/public/images/pixelpets/kougra/happy_male_red_kougra.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
+        (NULL, 'Hopper', 'ogrin', 'yellow', 'female', '/public/images/pixelpets/ogrin/happy_female_yellow_ogrin.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
+        (NULL, 'Spike', 'kacheek', 'green', 'male', '/public/images/pixelpets/kacheek/happy_male_green_kacheek.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW());
 
 INSERT INTO pet_interactions (pet_id, user_id, interaction_type, timestamp)
 VALUES 

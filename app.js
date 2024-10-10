@@ -41,7 +41,7 @@ app.get('/auth', async (req, res) => {
 // Fully Protected Routes
 app.use('/users', authRequired, userRoutes);
 app.use('/pets', authRequired, petRoutes);
-app.use('/pound', poundRoutes);
+app.use('/pound', authRequired, poundRoutes);
 
 // Server info
 const PORT = process.env.PORT || 3000;

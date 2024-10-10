@@ -10,7 +10,7 @@ CREATE TABLE users (
 CREATE TABLE pets (
     id SERIAL PRIMARY KEY,
     owner_id INTEGER REFERENCES users(id) ON DELETE SET NULL, -- Link to the users table, NULL means adoption center
-    name VARCHAR(50) UNIQUE NOT NULL CHECK (LENGTH(username) >= 3), 
+    name VARCHAR(50) UNIQUE NOT NULL CHECK (LENGTH(name) >= 3), 
     species VARCHAR(20) NOT NULL,
     color VARCHAR(20) NOT NULL,
     gender VARCHAR(10) NOT NULL,
