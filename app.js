@@ -15,6 +15,41 @@ const { authRequired } = require('./middleware/auth');
 
 app.use(express.json());
 
+// Added 2024.10.10 - mentor help
+app.use(
+  cors({
+    AccessControlAllowOrigin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "https://capstone-project2-pt29.onrender.com/",
+      "https://front-end-4ytj.onrender.com",
+    ],
+    // origin:"https://front-end-4ytj.onrender.com",
+    origin: "http://localhost:3000",
+    methods: ("GET", "POST", "PUT", "DELETE"),
+    credentials: true,
+  })
+);
+app.use(cookieParser());
+app.use(bodyparser.urlencoded({ extended: true }));
+app.use(bodyparser());
+app.set('trust proxy', true)
+app.use(
+  session({
+    // store: new RedisStore({ client: redisClient }),
+    key: "user",
+    secret: "secret",
+    resave: true,
+    saveUninitialized: true,
+    cookie: {
+      secure: false, // Ensure cookies are only sent over HTTPS in production
+      sameSite: "none", // Prevents CSRF attacks; use 'strict' in production,
+      expires: 1000 * 60 * 60 * 24,
+    },
+  })
+);
+
+
 // Unprotected Routes
 app.get('/', (req, res) => {
     res.json('Welcome to Pixelpets!');
