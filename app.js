@@ -5,10 +5,10 @@ const express = require('express');
 const app = express();
 
 // Added 2024.10.10 - mentor helpimport cors from 'cors'; // CORS middleware
-import cors from 'cors'; // CORS middleware
-import cookieParser from 'cookie-parser'; // Cookie parser middleware
-import bodyParser from 'body-parser'; // Body parser middleware
-import session from 'express-session'; // Session middleware
+const cors = require('cors'); // CORS middleware
+const cookieParser = require('cookie-parser'); // Cookie parser middleware
+const bodyParser = require('body-parser'); // Body parser middleware
+const session = require('express-session'); // Session middleware
 
 const User = require('./models/user');
 const Pet = require('./models/pet');
