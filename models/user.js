@@ -63,7 +63,7 @@ class User {
             const result = await db.query(
                 `INSERT INTO users (username, email, password, created_at, updated_at)
                 VALUES ($1, $2, $3, NOW(), NOW())
-                RETURNING id, username, email, created_at, updated_at;`,
+                RETURNING id, username, email, created_at, updated_at, admin;`,
                 [username, email, hashedPassword]
             );
 
@@ -103,7 +103,10 @@ class User {
                 user: { 
                     id: user.id, 
                     username: user.username, 
-                    email: user.email 
+                    email: user.email,
+                    created_at: user.created_at,
+                    updated_at: user.updated_at,
+                    admin: user.admin,
                 } 
             };
         } catch (error) {
