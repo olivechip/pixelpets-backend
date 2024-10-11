@@ -21,8 +21,8 @@ app.use(
     AccessControlAllowOrigin: [
       "http://localhost:3000",
       "http://localhost:3001",
-      "https://capstone-project2-pt29.onrender.com/",
-      "https://front-end-4ytj.onrender.com",
+      "https://pixelpets-frontend.onrender.com/",
+      "https://pixelpets-backend.onrender.com/",
     ],
     // origin:"https://front-end-4ytj.onrender.com",
     origin: "http://localhost:3000",
