@@ -11,7 +11,7 @@ class User {
     // Fetch all users
     static async findAll(){
         try {
-            const result = db.query(`SELECT id, username, email, created_at, updated_at FROM users;`);
+            const result = db.query(`SELECT id, username, email, created_at, updated_at, admin FROM users;`);
             return result;
         } catch (error) {
             console.error('Error finding users:', error);
@@ -41,7 +41,7 @@ class User {
         const conditions = keys.map((key, index) => `${key} = $${index + 1}`).join(' AND ');
 
         try {
-            const result = await db.query(`SELECT id, username, password, email, created_at, updated_at FROM users WHERE ${conditions}`, Object.values(criteria));
+            const result = await db.query(`SELECT id, username, password, email, created_at, updated_at, admin FROM users WHERE ${conditions}`, Object.values(criteria));
             return result.rows[0] || null;
         } catch (error) {
             console.error('Error finding user:', error);

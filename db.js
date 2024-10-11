@@ -65,7 +65,8 @@ const createTables = async () => {
         password VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        admin BOOLEAN NOT NULL DEFAULT false
     );`;
 
     const createPetsTable = `
@@ -112,6 +113,7 @@ const seedData = async () => {
     const seedUsers = `
         INSERT INTO users (username, password, email, created_at, updated_at)
         VALUES 
+            ('admin', '$2b$12$AZH7virni5jlTTiGgEg4zu3lSvAw68qVEfSIOjJ3RqtbJbdW/Oi5q', 'admin@email.com', NOW(), NOW(), true),
             ('user1', '$2b$12$AZH7virni5jlTTiGgEg4zu3lSvAw68qVEfSIOjJ3RqtbJbdW/Oi5q', 'user1@email.com', NOW(), NOW()),
             ('user2', '$2b$12$AZH7virni5jlTTiGgEg4zu3lSvAw68qVEfSIOjJ3RqtbJbdW/Oi5q', 'user2@email.com', NOW(), NOW());
     `;

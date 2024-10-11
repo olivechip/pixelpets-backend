@@ -68,10 +68,10 @@ class Pet {
         try {
             const result = await db.query(
                 `SELECT 
-                p.*,
-                u.username AS owner_name,
-                MAX(pi.timestamp) FILTER (WHERE pi.interaction_type = 'play') AS last_played,
-                MAX(pi.timestamp) FILTER (WHERE pi.interaction_type = 'feed') AS last_fed
+                    p.*,
+                    u.username AS owner_name,
+                    MAX(pi.timestamp) FILTER (WHERE pi.interaction_type = 'play') AS last_played,
+                    MAX(pi.timestamp) FILTER (WHERE pi.interaction_type = 'feed') AS last_fed
                 FROM pets p
                 LEFT JOIN users u ON p.owner_id = u.id
                 LEFT JOIN pet_interactions pi ON p.id = pi.pet_id 
