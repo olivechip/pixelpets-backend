@@ -30,8 +30,11 @@ const connectDB = async () => {
     }
 };
 
+
+// The following SQL commands only exist to init Render DB
 // Comment until 'end' for dev
-// // Function to execute SQL commands
+
+// Function to execute SQL commands
 const executeSQL = async (query) => {
     try {
         const res = await db.query(query);
@@ -164,17 +167,14 @@ const seedData = async () => {
 const initializeDB = async () => {
     await connectDB();
 
-    // Comment next 3 lines for dev
+    // Comment next 3 lines for Render
     await dropTables();
     await createTables();
     await seedData();
+
     console.log(`DB initialized on ${db.host}-${db.database}!`)
 };
 
 initializeDB();
-// Comment out for dev - end
 
 module.exports = db;
-
-// Comment out for dev
-// module.exports = { db, executeSQL, initializeDB };
