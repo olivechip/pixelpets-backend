@@ -1,9 +1,9 @@
 /** Express app for Pixelpets. */
 
-require('dotenv').config()
 const express = require('express');
 const app = express();
 const cors = require("cors");
+require('dotenv').config()
 
 const User = require('./models/user');
 const Pet = require('./models/pet');
@@ -20,6 +20,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
+
 
 // Unprotected Routes
 app.get('/', (req, res) => {

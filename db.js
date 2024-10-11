@@ -6,15 +6,17 @@ require('dotenv').config();
 let db;
 
 // Configuration for db connection
-if (process.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'development') {
+    console.log('Connecting to dev db...')
     // local
     db = new Client({
         host: '/var/run/postgresql',
         database: 'pixelpets'
     });
 } else {
+    console.log('Connecting to prod db...')
     db = new Client({
-        connectionString: 'postgres://pixelpets_psql_user:98UgtNP26mX4fXziX3SC5jSfjdMlGKoh@dpg-cs45id5umphs73d7a6eg-a:5432/pixelpets_psql',
+        connectionString: process.env.DATABASE_URL,
         ssl: { rejectUnauthorized: false }
     });
 }
