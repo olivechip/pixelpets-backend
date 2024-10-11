@@ -4,12 +4,6 @@ require('dotenv').config()
 const express = require('express');
 const app = express();
 
-// Added 2024.10.10 - mentor helpimport cors from 'cors'; // CORS middleware
-const cors = require('cors'); // CORS middleware
-const cookieParser = require('cookie-parser'); // Cookie parser middleware
-const bodyParser = require('body-parser'); // Body parser middleware
-const session = require('express-session'); // Session middleware
-
 const User = require('./models/user');
 const Pet = require('./models/pet');
 
@@ -20,41 +14,6 @@ const poundRoutes = require('./routes/poundRoutes');
 const { authRequired } = require('./middleware/auth');
 
 app.use(express.json());
-
-// Added 2024.10.10 - mentor help
-app.use(
-  cors({
-    AccessControlAllowOrigin: [
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "https://pixelpets-frontend.onrender.com/",
-      "https://pixelpets-backend.onrender.com/",
-    ],
-    // origin:"https://front-end-4ytj.onrender.com",
-    origin: "http://localhost:3000",
-    methods: ("GET", "POST", "PUT", "DELETE"),
-    credentials: true,
-  })
-);
-app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser());
-app.set('trust proxy', true)
-app.use(
-  session({
-    // store: new RedisStore({ client: redisClient }),
-    key: "user",
-    secret: "secret",
-    resave: true,
-    saveUninitialized: true,
-    cookie: {
-      secure: false, // Ensure cookies are only sent over HTTPS in production
-      sameSite: "none", // Prevents CSRF attacks; use 'strict' in production,
-      expires: 1000 * 60 * 60 * 24,
-    },
-  })
-);
-
 
 // Unprotected Routes
 app.get('/', (req, res) => {
