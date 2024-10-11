@@ -122,9 +122,9 @@ const seedData = async () => {
     const seedPets = `
         INSERT INTO pets (owner_id, name, species, color, gender, img_url, happiness, hunger, popularity, created_at, updated_at)
         VALUES 
-            ((SELECT id FROM users WHERE id = 1), 'Fluffy', 'kougra', 'yellow', 'female', '/images/pixelpets/kougra/happy_female_yellow_kougra.png', 100, 100, 0, NOW(), NOW()),
-            ((SELECT id FROM users WHERE id = 2), 'Buddy', 'techo', 'blue', 'male', '/images/pixelpets/techo/happy_male_blue_techo.png', 50, 50, 0, NOW(), NOW()),
-            ((SELECT id FROM users WHERE id = 2), 'Goldie', 'vandagyre', 'green', 'female', '/images/pixelpets/vandagyre/happy_female_green_vandagyre.png', 70, 50, 0, NOW(), NOW()),
+            ((SELECT id FROM users WHERE id = 2), 'Fluffy', 'kougra', 'yellow', 'female', '/images/pixelpets/kougra/happy_female_yellow_kougra.png', 100, 100, 0, NOW(), NOW()),
+            ((SELECT id FROM users WHERE id = 3), 'Buddy', 'techo', 'blue', 'male', '/images/pixelpets/techo/happy_male_blue_techo.png', 50, 50, 0, NOW(), NOW()),
+            ((SELECT id FROM users WHERE id = 3), 'Goldie', 'vandagyre', 'green', 'female', '/images/pixelpets/vandagyre/happy_female_green_vandagyre.png', 70, 50, 0, NOW(), NOW()),
             (NULL, 'Patches', 'moehog', 'red', 'male', '/images/pixelpets/moehog/happy_male_red_moehog.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()), 
             (NULL, 'Whiskers', 'xweetok', 'blue', 'female', '/images/pixelpets/xweetok/happy_female_blue_xweetok.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()),
             (NULL, 'Spot', 'nimmo', 'blue', 'male', '/images/pixelpets/nimmo/happy_male_blue_nimmo.png', 0, 0, (random() * 4 + 1)::int, NOW(), NOW()), 
@@ -141,10 +141,10 @@ const seedData = async () => {
     const seedPIs = `
         INSERT INTO pet_interactions (pet_id, user_id, interaction_type, timestamp)
         VALUES 
-            (1, 1, 'feed', '2024-09-15 10:30:00+00'),
-            (1, 1, 'play', '2024-09-13 18:20:00+00'),
-            (2, 2, 'play', '2024-09-15 08:15:00+00'),
-            (3, 2, 'feed', '2024-09-13 14:00:00+00');
+            (1, 2, 'feed', '2024-09-15 10:30:00+00'),
+            (1, 2, 'play', '2024-09-13 18:20:00+00'),
+            (2, 3, 'play', '2024-09-15 08:15:00+00'),
+            (3, 3, 'feed', '2024-09-13 14:00:00+00');
     `;
     await executeSQL(seedPIs);
 
