@@ -3,6 +3,7 @@
 require('dotenv').config()
 const express = require('express');
 const app = express();
+const cors = require("cors");
 
 const User = require('./models/user');
 const Pet = require('./models/pet');
@@ -13,6 +14,11 @@ const petRoutes = require('./routes/petRoutes');
 const poundRoutes = require('./routes/poundRoutes');
 const { authRequired } = require('./middleware/auth');
 
+const corsOptions = {
+  origin: ['https://pixelpets-frontend.onrender.com', 'http://localhost:3000']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Unprotected Routes
