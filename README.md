@@ -13,15 +13,17 @@ These instructions will get you a copy of the project up and running on your loc
 1. Clone the repository: `git clone <backend-repository-url>`
 2. Install dependencies: `npm install`
 3. Set up the database:
-   * Create a PostgreSQL database (e.g., `pixelpets_db`).
-   * Update the database connection details in the `.env` file.
-4. Start the development server: `node app.js`
+   * Create a PostgreSQL database (e.g., `pixelpets`).
+   * Update the database connection details in the `.env` and/or `db.js` file.
+4. Start the development server: `npm run dev`
 
 ## API Endpoints
 
-* `/users`: Endpoints for user authentication and management.
+* `/users`: Endpoints for user management.
 * `/pets`:  Endpoints for creating, retrieving, updating, and deleting Pixelpets.
 * `/pound`: Endpoints for managing the Pixel Pound (adoption and releasing pets).
+* `/auth`: Endpoints for user authentication and token refresh.
+* `/admin`: QOL endpoint for easy retrieval of all users and all pets.
 
 ## Future Development
 
