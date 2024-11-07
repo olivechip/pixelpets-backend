@@ -50,26 +50,15 @@ app.get('/pets/featured', async (req, res) => {
   }
 });
 
-// Search for pets by keyword
-app.post('/pets/search', async (req, res) => {
-  try {
-    const { keyword } = req.body;
-    const pets = await Pet.search(keyword);
-    res.json(pets);
-  } catch (error) {
-    console.error('Error searching for pets:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// Search for users by keyword
-app.post('/users/search', async (req, res) => {
+// Search for pets/users by keyword
+app.post('/search', async (req, res) => {
   try {
     const { keyword } = req.body;
     const users = await User.search(keyword);
-    res.json(users);
+    const pets = await Pet.search(keyword);
+    res.json([users, pets]);
   } catch (error) {
-    console.error('Error searching for users:', error);
+    console.error('Error searching for pets:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
