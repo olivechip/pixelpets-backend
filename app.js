@@ -39,6 +39,17 @@ app.get('/admin', async (req, res) => {
   }
 });
 
+// Search for all pets for featured
+app.get('/pets/featured', async (req, res) => {
+  try {
+    const pets = await Pet.findAll();
+    res.json(pets.rows);
+  } catch (error) {
+    console.error('Error searching for pets:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Search for pets by keyword
 app.post('/pets/search', async (req, res) => {
   try {
