@@ -13,17 +13,18 @@ router.get('/', async (req, res) => {
   }
 });
 
+// moved to unprotected
 // Search for pets by keyword
-router.post('/search', async (req, res) => {
-  try {
-    const { keyword } = req.body; 
-    const pets = await Pet.search(keyword);
-    res.json(pets); 
-  } catch (error) {
-    console.error('Error searching for pets:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
+// router.post('/search', async (req, res) => {
+//   try {
+//     const { keyword } = req.body; 
+//     const pets = await Pet.search(keyword);
+//     res.json(pets); 
+//   } catch (error) {
+//     console.error('Error searching for pets:', error);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
 
 // Get a pet by ID
 router.get('/:petId', async (req, res) => {
@@ -75,7 +76,7 @@ router.put('/:petId', async (req, res) => {
     }
 
     // Check if the user is the owner
-    if (petData.owner_id !== req.user.id) { 
+    if (petData.owner_id !== req.user.id) {
       return res.status(403).json({ error: 'You can only update your own pet' });
     }
 
@@ -98,7 +99,7 @@ router.delete('/:petId', async (req, res) => {
     }
 
     // Check if the user is the owner
-    if (petData.owner_id !== req.user.userId) { 
+    if (petData.owner_id !== req.user.userId) {
       return res.status(403).json({ error: 'You can only delete your own pet' });
     }
 
@@ -123,7 +124,7 @@ router.post('/:petId/play', async (req, res) => {
     const pet = new Pet(petData);
 
     // Check if the user is the owner
-    if (pet.owner_id !== userId) { 
+    if (pet.owner_id !== userId) {
       return res.status(403).json({ error: 'You can only play with your own pet' });
     }
 
@@ -134,7 +135,7 @@ router.post('/:petId/play', async (req, res) => {
     console.error('Error playing with pet:', error);
 
     if (error.message.startsWith('HungerTooLow:')) {
-      return res.status(400).json({ error: error.message.replace('HungerTooLow:', '') }); 
+      return res.status(400).json({ error: error.message.replace('HungerTooLow:', '') });
     }
 
     res.status(500).json({ error: 'Server error' });
@@ -153,7 +154,7 @@ router.post('/:petId/feed', async (req, res) => {
     const pet = new Pet(petData);
 
     // Check if the user is the owner
-    if (pet.owner_id !== userId) { 
+    if (pet.owner_id !== userId) {
       return res.status(403).json({ error: 'You can only feed your own pet' });
     }
 
@@ -183,18 +184,18 @@ router.post('/:petId/pet', async (req, res) => {
     }
     const pet = new Pet(petData);
 
-    await pet.pet(userId); 
+    await pet.pet(userId);
 
-    res.json({ 
+    res.json({
       message: `Petted ${pet.name} successfully`,
-      petId: pet.id 
+      petId: pet.id
     });
   } catch (error) {
     console.error('Error petting pet:', error);
 
     // Handle the specific "once per day" error
     if (error.message.startsWith('PettingLimitReached:')) {
-      return res.status(400).json({ error: error.message.replace('PettingLimitReached: ', '') }); 
+      return res.status(400).json({ error: error.message.replace('PettingLimitReached: ', '') });
     }
 
     res.status(500).json({ error: 'Server error' });

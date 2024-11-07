@@ -6,25 +6,26 @@ const Pet = require('../models/pet');
 // Get all users (for testing/admin purposes, might need authentication later)
 router.get('/', async (req, res) => {
     try {
-      const users = await User.findAll(); 
-      res.json(users.rows);
+        const users = await User.findAll();
+        res.json(users.rows);
     } catch (error) {
-      console.error('Error fetching users:', err);
-      res.status(500).json({ error: 'Server Error' }); 
-    }
-  });
-
-// Search for users by keyword
-router.post('/search', async (req, res) => {
-    try {
-      const { keyword } = req.body; 
-      const users = await User.search(keyword);
-      res.json(users); 
-    } catch (error) {
-      console.error('Error searching for users:', error);
-      res.status(500).json({ error: 'Server error' });
+        console.error('Error fetching users:', err);
+        res.status(500).json({ error: 'Server Error' });
     }
 });
+
+// moved to unprotected
+// Search for users by keyword
+// router.post('/search', async (req, res) => {
+//     try {
+//       const { keyword } = req.body; 
+//       const users = await User.search(keyword);
+//       res.json(users); 
+//     } catch (error) {
+//       console.error('Error searching for users:', error);
+//       res.status(500).json({ error: 'Server error' });
+//     }
+// });
 
 // Get user by ID
 router.get('/:userId', async (req, res) => {
@@ -46,7 +47,7 @@ router.get('/:userId', async (req, res) => {
 router.get('/:userId/pets', async (req, res) => {
     const { userId } = req.params;
     try {
-        const pets = await Pet.findByOwnerId(userId); 
+        const pets = await Pet.findByOwnerId(userId);
         res.json(pets);
     } catch (error) {
         console.error('Error fetching pets', error);
@@ -84,10 +85,10 @@ router.delete('/:userId', async (req, res) => {
     try {
         const deleted = await User.delete(userId, { username, email, password });
 
-        if (deleted) { 
-            res.status(200).json({ message: 'User deleted successfully' }); 
+        if (deleted) {
+            res.status(200).json({ message: 'User deleted successfully' });
         } else {
-            res.status(404).json({ error: 'User not found' }); 
+            res.status(404).json({ error: 'User not found' });
         }
     } catch (error) {
         console.error('Error deleting user:', error);

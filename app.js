@@ -24,20 +24,46 @@ app.use(express.json());
 
 // Unprotected Routes
 app.get('/', (req, res) => {
-    res.json('Welcome to Pixelpets!');
+  res.json('Welcome to Pixelpets!');
 });
 
+// Full search of all users/pets (testing purposes)
 app.get('/admin', async (req, res) => {
   try {
-    const users = await User.findAll(); 
+    const users = await User.findAll();
     const pets = await Pet.findAll();
     res.json([users.rows, pets.rows]);
   } catch (error) {
     console.error('Error fetching data:', error);
-    res.status(500).json({ error: 'Server Error' }); 
+    res.status(500).json({ error: 'Server Error' });
   }
 });
 
+// Search for pets by keyword
+app.post('/pets/search', async (req, res) => {
+  try {
+    const { keyword } = req.body;
+    const pets = await Pet.search(keyword);
+    res.json(pets);
+  } catch (error) {
+    console.error('Error searching for pets:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Search for users by keyword
+app.post('/users/search', async (req, res) => {
+  try {
+    const { keyword } = req.body;
+    const users = await User.search(keyword);
+    res.json(users);
+  } catch (error) {
+    console.error('Error searching for users:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Auth Routes
 app.use('/auth', authRoutes);
 
 // Test Route
