@@ -18,7 +18,7 @@ class Pet {
     }
 
     // Fetch all pets
-    static async findAll(){
+    static async findAll() {
         try {
             const result = db.query(
                 `SELECT 
@@ -52,9 +52,9 @@ class Pet {
                 LEFT JOIN pet_interactions pi ON p.id = pi.pet_id 
                 WHERE p.name ILIKE $1 OR p.species ILIKE $1 OR p.color ILIKE $1
                 GROUP BY p.id, u.username;
-                `, [`%${keyword}%`] 
+                `, [`%${keyword}%`]
             );
-            return result.rows; 
+            return result.rows;
         } catch (error) {
             console.error('Error searching pets:', error);
             throw new Error('Database query failed');
@@ -112,7 +112,7 @@ class Pet {
             const result = await db.query(
                 `INSERT INTO pets (owner_id, name, species, color, gender, img_url, happiness, hunger, popularity, created_at, updated_at)
                 VALUES ($1, $2, $3, $4, $5, $6, 80, 80, 0, NOW(), NOW())
-                RETURNING *;`, 
+                RETURNING *;`,
                 [owner_id, name, species, color, gender, img_url]
             );
             return result.rows[0];
@@ -126,7 +126,7 @@ class Pet {
     static async update(petId, updates) {
         const keys = Object.keys(updates);
         const setClause = keys.map((key, index) => `${key} = $${index + 2}`).join(', ');
-    
+
         try {
             const result = await db.query(
                 `UPDATE pets SET ${setClause}, updated_at = NOW() WHERE id = $1 RETURNING *;`,
@@ -150,6 +150,17 @@ class Pet {
         }
     }
 
+    // List by Popularity
+    static async popular() {
+        try {
+            const result = await db.query('SELECT id, name, popularity AS p FROM pets ORDER BY p DESC;');
+            return result;
+        } catch (error) {
+            console.error('Error listing by popularity:', error);
+            throw new Error('Popularity listing failed');
+        }
+    }
+
     // Play w/ pet (instance method)
     async play() {
         try {
@@ -166,9 +177,9 @@ class Pet {
                 ON CONFLICT (pet_id, user_id, interaction_type) DO UPDATE
                 SET timestamp = NOW();
                 `,
-                [this.id, this.owner_id] 
+                [this.id, this.owner_id]
             );
-    
+
             // 2. Update the pet's stats
             await db.query(
                 `
@@ -179,7 +190,7 @@ class Pet {
                 `,
                 [this.id]
             );
-    
+
             console.log(`You played with ${this.name}!`);
         } catch (error) {
             console.error('Error playing with pet:', error);
@@ -187,7 +198,7 @@ class Pet {
             if (error.message.startsWith('HungerTooLow:')) {
                 throw error;
             } else {
-                throw new Error('Playing failed'); 
+                throw new Error('Playing failed');
             }
         }
     }
@@ -203,9 +214,9 @@ class Pet {
                 ON CONFLICT (pet_id, user_id, interaction_type) DO UPDATE
                 SET timestamp = NOW();
                 `,
-                [this.id, this.owner_id] 
+                [this.id, this.owner_id]
             );
-        
+
             // 2. Update the pet's stats
             await db.query(
                 `
@@ -215,7 +226,7 @@ class Pet {
                 `,
                 [this.id]
             );
-        
+
             console.log(`${this.name} has been fed!`);
         } catch (error) {
             console.error('Error feeding pet:', error);
@@ -224,18 +235,18 @@ class Pet {
     }
 
     // Pet another pet (instance method)
-    async pet(userId) { 
+    async pet(userId) {
         try {
             // Check if the user has already petted this pet today
             const today = new Date();
-        
+
             const result = await db.query(
                 `SELECT * FROM pet_interactions 
                 WHERE pet_id = $1 AND user_id = $2 AND interaction_type = 'pet' 
                 AND timestamp >= NOW() - INTERVAL '1 day';`,
                 [this.id, userId]
             );
-            
+
             // TESTING! REMOVE THE ! FOR UNLIMITED PETS, ADD ! FOR ONCE A DAY 
             if (result.rows.length === 0) { // User hasn't petted today
                 // 1. Insert/update the interaction
@@ -248,7 +259,7 @@ class Pet {
                     `,
                     [this.id, userId]
                 );
-        
+
                 // 2. Update the pet's stats
                 await db.query(
                     `
@@ -258,7 +269,7 @@ class Pet {
                     `,
                     [this.id]
                 );
-        
+
                 console.log(`You petted ${this.name}!`);
             } else {
                 throw new Error('PettingLimitReached: You can only pet this pet once per day');
@@ -268,7 +279,7 @@ class Pet {
             if (error.message.startsWith('PettingLimitReached:')) {
                 throw error;
             } else {
-                throw new Error('Petting failed'); 
+                throw new Error('Petting failed');
             }
         }
     }

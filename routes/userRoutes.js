@@ -27,6 +27,17 @@ router.get('/', async (req, res) => {
 //     }
 // });
 
+router.get('/interactions', async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const interactions = await User.interactions(userId);
+        res.json(interactions.rows);
+    } catch (error) {
+        console.error('Error fetching interactions:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 // Get user by ID
 router.get('/:userId', async (req, res) => {
     const { userId } = req.params;
@@ -95,5 +106,6 @@ router.delete('/:userId', async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 });
+
 
 module.exports = router;

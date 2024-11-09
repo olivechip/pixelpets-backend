@@ -111,6 +111,16 @@ router.delete('/:petId', async (req, res) => {
   }
 });
 
+router.get('/list/popular', async (req, res) => {
+  try {
+    const pets = await Pet.popular();
+    res.json(pets.rows);
+  } catch (error) {
+    console.error('Error listing pets:', error);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
 // Play with a pet
 router.post('/:petId/play', async (req, res) => {
   const { petId } = req.params;
@@ -142,6 +152,7 @@ router.post('/:petId/play', async (req, res) => {
   }
 });
 
+// Feed a pet
 router.post('/:petId/feed', async (req, res) => {
   const { petId } = req.params;
   const { userId } = req.user;

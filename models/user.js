@@ -9,7 +9,7 @@ const { generateToken, generateRefreshToken } = require('../routes/authService')
 class User {
 
     // Fetch all users
-    static async findAll(){
+    static async findAll() {
         try {
             const result = db.query(`SELECT id, username, email, created_at, updated_at, admin FROM users;`);
             return result;
@@ -25,8 +25,8 @@ class User {
             const result = await db.query(
                 `SELECT * 
                 FROM users 
-                WHERE username ILIKE $1`, 
-                [`%${keyword}%`] 
+                WHERE username ILIKE $1`,
+                [`%${keyword}%`]
             );
             return result.rows;
         } catch (error) {
@@ -36,7 +36,7 @@ class User {
     }
 
     // Find user by criteria
-    static async find(criteria){
+    static async find(criteria) {
         const keys = Object.keys(criteria);
         const conditions = keys.map((key, index) => `${key} = $${index + 1}`).join(' AND ');
 
@@ -56,9 +56,9 @@ class User {
 
         existingUser = await this.find({ email });
         if (existingUser) throw new Error('Email already exists');
-        
+
         const hashedPassword = await bcrypt.hash(password, 10);
-    
+
         try {
             const result = await db.query(
                 `INSERT INTO users (username, email, password, created_at, updated_at)
@@ -71,10 +71,10 @@ class User {
             const { token, expirationTime } = generateToken(user);
             const { refreshToken, refreshTokenExpirationTime } = generateRefreshToken(user);
 
-            return { 
-                token, 
-                refreshToken, 
-                expirationTime, 
+            return {
+                token,
+                refreshToken,
+                expirationTime,
                 refreshTokenExpirationTime,
                 user
             };
@@ -83,7 +83,7 @@ class User {
             throw new Error('Registration failed');
         }
     }
-    
+
     // Log in user
     static async login({ email, password }) {
         const user = await this.find({ email });
@@ -95,47 +95,47 @@ class User {
         try {
             const { token, expirationTime } = generateToken(user);
             const { refreshToken, refreshTokenExpirationTime } = generateRefreshToken(user);
-            return { 
-                token, 
-                refreshToken, 
-                expirationTime, 
+            return {
+                token,
+                refreshToken,
+                expirationTime,
                 refreshTokenExpirationTime,
-                user: { 
-                    id: user.id, 
-                    username: user.username, 
+                user: {
+                    id: user.id,
+                    username: user.username,
                     email: user.email,
                     created_at: user.created_at,
                     updated_at: user.updated_at,
                     admin: user.admin,
-                } 
+                }
             };
         } catch (error) {
             console.error('Error logging in:', error);
             throw new Error('Login failed');
         }
     }
-    
+
     // Update user
-    static async update(userId, updates) {  
-        const keys = Object.keys(updates);  
+    static async update(userId, updates) {
+        const keys = Object.keys(updates);
 
         // Checks that password matches db 
         try {
             const user = await this.find({ id: userId });
-            if (!user || !(await bcrypt.compare(updates.currentPassword, user.password))){
+            if (!user || !(await bcrypt.compare(updates.currentPassword, user.password))) {
                 throw new Error('Invalid password');
             }
         } catch (error) {
             throw error;
         }
 
-        const allowedKeys = ['username', 'email', 'password']; 
+        const allowedKeys = ['username', 'email', 'password'];
 
         // Check if password is being updated and hash it
-        if (updates.newPassword) {  
+        if (updates.newPassword) {
             updates.password = await bcrypt.hash(updates.newPassword, 10);
             delete updates.newPassword;
-        } 
+        }
         delete updates.currentPassword;
 
         // Filter updates for new UPDATE clause
@@ -152,24 +152,24 @@ class User {
         const setClause = Object.keys(filteredUpdates)
             .map((key, index) => `${key} = $${index + 2}`)
             .join(', ');
-    
-        try {  
-            const result = await db.query(  
-                `UPDATE users SET ${setClause}, updated_at = NOW() WHERE id = $1 RETURNING id, username, email, created_at, updated_at;`,  
-                [userId, ...Object.values(filteredUpdates)]  
-            );  
-            return result.rows[0];  
-        } catch (error) {  
-            console.error('Error updating user:', error);  
-            throw new Error('Update failed');  
-        } 
+
+        try {
+            const result = await db.query(
+                `UPDATE users SET ${setClause}, updated_at = NOW() WHERE id = $1 RETURNING id, username, email, created_at, updated_at;`,
+                [userId, ...Object.values(filteredUpdates)]
+            );
+            return result.rows[0];
+        } catch (error) {
+            console.error('Error updating user:', error);
+            throw new Error('Update failed');
+        }
     }
-    
+
     // Delete user
-    static async delete(userId, { username, email, password }) { 
+    static async delete(userId, { username, email, password }) {
         try {
             const user = await this.find({ id: userId });
-    
+
             if (!user || user.username !== username || user.email !== email || !(await bcrypt.compare(password, user.password))) {
                 throw new Error('Invalid credentials');
             }
@@ -178,18 +178,28 @@ class User {
             const result = await db.query('DELETE FROM users WHERE id = $1 RETURNING id;', [userId]);
             if (result.rowCount > 0) {
                 for (const pet of userPets) {
-                    await Pound.abandon(pet.id); 
+                    await Pound.abandon(pet.id);
                 }
             }
-    
+
             return result.rowCount > 0;
         } catch (error) {
             console.error('Error deleting user:', error.stack);
             if (error.message === 'Invalid credentials') {
-                throw error; 
+                throw error;
             } else {
                 throw new Error('Deletion failed');
             }
+        }
+    }
+
+    static async interactions(userId) {
+        try {
+            const result = await db.query('SELECT * FROM pet_interactions WHERE user_id = $1 ORDER BY timestamp desc;', [userId]);
+            return result;
+        } catch (error) {
+            console.error('Error finding interactions:', error);
+            throw new Error('Database query failed');
         }
     }
 }
